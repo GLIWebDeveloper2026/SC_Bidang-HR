@@ -480,40 +480,43 @@ export function LowonganPage() {
   return (
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1, mb: 2, flexWrap: 'wrap' }}>
-        <Tooltip title={selectedIds.length > 0 ? 'Hapus pilihan' : 'Pilih data untuk menghapus'}>
-          <span>
-            <IconButton
-              onClick={() => setDeleteDialogOpen(true)}
-              disabled={selectedIds.length === 0}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 2,
-                color: selectedIds.length > 0 ? 'error.main' : 'text.secondary',
-              }}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </span>
-        </Tooltip>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: { xs: '100%', sm: 'auto' } }}>
+          <Tooltip title={selectedIds.length > 0 ? 'Hapus pilihan' : 'Pilih data untuk menghapus'}>
+            <span>
+              <IconButton
+                onClick={() => setDeleteDialogOpen(true)}
+                disabled={selectedIds.length === 0}
+                sx={{
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 2,
+                  color: selectedIds.length > 0 ? 'error.main' : 'text.secondary',
+                }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
 
-        <TextField
-          placeholder="Cari posisi, perusahaan, email, no telp..."
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          size="small"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            minWidth: { xs: '100%', sm: 280 },
-            '& .MuiOutlinedInput-root': { borderRadius: 2 },
-          }}
-        />
+          <TextField
+            placeholder="Cari posisi, perusahaan, email, no telp..."
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              flex: { xs: 1, sm: '0 0 auto' },
+              minWidth: { xs: 0, sm: 280 },
+              '& .MuiOutlinedInput-root': { borderRadius: 2 },
+            }}
+          />
+        </Box>
 
         <Button
           variant="outlined"
@@ -650,8 +653,8 @@ export function LowonganPage() {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                       <Box
                         sx={{
-                          width: 36,
-                          height: 36,
+                          width: 28,
+                          height: 28,
                           flexShrink: 0,
                           borderRadius: 1,
                           bgcolor: 'primary.main',
@@ -661,7 +664,7 @@ export function LowonganPage() {
                           justifyContent: 'center',
                         }}
                       >
-                        <WorkIcon fontSize="small" />
+                        <WorkIcon sx={{ fontSize: 18 }} />
                       </Box>
                       <Box sx={{ minWidth: 0 }}>{renderCellText(item.posisi, 500)}</Box>
                     </Box>

@@ -17,8 +17,16 @@ import {
 import { NavItem } from './NavItem';
 import { useAuth } from '@/hooks';
 import logoLockupLight from '@/assets/logo-lockup.svg';
+import { getMenuPermissionsByRole, type MenuPermissionKey } from '@/constants/menuPermissions';
 
 export const DRAWER_WIDTH = 254;
+
+interface SidebarNavItem {
+  menuKey: MenuPermissionKey;
+  label: string;
+  path: string;
+  icon: React.ReactNode;
+}
 
 interface SidebarProps {
   open: boolean;
@@ -29,24 +37,29 @@ interface SidebarProps {
 export function Sidebar({ open, onClose, variant }: SidebarProps) {
   const { user } = useAuth();
   const displayName = user?.displayName || user?.name || user?.email || 'User';
+  const allowedMenuKeys = getMenuPermissionsByRole(user?.role);
 
-  const mainNavItems = [
+  const mainNavItems: SidebarNavItem[] = [
     {
+      menuKey: 'dashboard',
       label: 'Dashboard',
       path: '/dashboard',
       icon: <DashboardIcon fontSize="small" />,
     },
     {
+      menuKey: 'lowongan',
       label: 'Lowongan',
       path: '/lowongan',
       icon: <WorkIcon fontSize="small" />,
     },
     {
+      menuKey: 'lamaran',
       label: 'Lamaran',
       path: '/lamaran',
       icon: <AssignmentTurnedInIcon fontSize="small" />,
     },
     {
+      menuKey: 'user',
       label: 'User',
       path: '/user',
       icon: <GroupIcon fontSize="small" />,
@@ -73,6 +86,11 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
     { label: 'Kampus', path: '/master/kampus' },
     { label: 'Level User', path: '/master/level-user' },
   ];
+
+  const filteredMainNavItems = mainNavItems.filter((item) =>
+    allowedMenuKeys.includes(item.menuKey)
+  );
+  const showMasterMenu = allowedMenuKeys.includes('master');
 
   const drawerContent = (
     <Box
@@ -183,7 +201,7 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
       {/* Navigation */}
       <Box sx={{ flex: 1, overflow: 'auto', px: 2 }}>
         <List component="nav" disablePadding>
-          {mainNavItems.map((item) => (
+          {filteredMainNavItems.map((item) => (
             <NavItem
               key={item.path}
               label={item.label}
@@ -193,13 +211,15 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
           ))}
         </List>
 
-        <List component="nav" disablePadding sx={{ mt: 1 }}>
-          <NavItem
-            label="Master"
-            icon={<FolderIcon fontSize="small" />}
-            children={masterChildren}
-          />
-        </List>
+        {showMasterMenu && (
+          <List component="nav" disablePadding sx={{ mt: 1 }}>
+            <NavItem
+              label="Master"
+              icon={<FolderIcon fontSize="small" />}
+              children={masterChildren}
+            />
+          </List>
+        )}
 
         {/* <List component="nav" disablePadding sx={{ mt: 1 }}>
           <NavItem
