@@ -4,7 +4,7 @@ class AuthRepository {
   async createProfile(payload) {
     const { data, error } = await supabase
       .from('profiles')
-      .insert(payload)
+      .insert([payload])
       .select()
       .single();
 
