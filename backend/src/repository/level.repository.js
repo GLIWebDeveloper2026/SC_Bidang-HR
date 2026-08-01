@@ -1,4 +1,4 @@
-const db = require('../config/database'); // path ke config mysql2 pool kamu
+const db = require('../config/db'); // path ke config mysql2 pool kamu
 const { v4: uuidv4 } = require('uuid');
 
 class LevelRepository {
