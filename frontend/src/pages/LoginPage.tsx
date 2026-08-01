@@ -19,9 +19,9 @@ import {
   Visibility,
   VisibilityOff,
 } from '@mui/icons-material';
+import { buildSupabaseOAuthUrl } from '@/api/supabaseAuth';
 import { useAuth } from '@/hooks';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const AUTH_REDIRECT_ORIGIN =
   (import.meta.env.VITE_AUTH_REDIRECT_ORIGIN as string | undefined) || window.location.origin;
 
@@ -67,16 +67,8 @@ export function LoginPage() {
     setIsSigningIn(true);
 
     try {
-      if (!SUPABASE_URL) {
-        throw new Error('Missing VITE_SUPABASE_URL');
-      }
-
       const redirectTo = new URL(from, AUTH_REDIRECT_ORIGIN).toString();
-      const authUrl = new URL('/auth/v1/authorize', SUPABASE_URL);
-      authUrl.searchParams.set('provider', 'google');
-      authUrl.searchParams.set('redirect_to', redirectTo);
-
-      window.location.href = authUrl.toString();
+      window.location.href = buildSupabaseOAuthUrl('google', redirectTo);
     } catch {
       setError('Gagal membuka login Google. Cek konfigurasi Supabase dan Google provider.');
       setIsSigningIn(false);
@@ -132,7 +124,7 @@ export function LoginPage() {
               variant="h5"
               sx={{ fontWeight: 700, color: 'text.primary' }}
             >
-              Welcome to SaasAble
+              Welcome to KerjaKink
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               Login dengan email dan password untuk masuk ke dashboard

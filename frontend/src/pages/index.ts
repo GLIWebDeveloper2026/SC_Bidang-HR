@@ -1,6 +1,10 @@
 export { DashboardPage } from './DashboardPage';
 export { LoginPage } from './LoginPage';
 export { NotFoundPage } from './NotFoundPage';
-export { AccountPage } from './AccountPage';
+export { LowonganPage } from './perusahaan-page/LowonganPage';
+export { LamaranPage } from './mahasiswa-page/LamaranPage';
 export { UserPage } from './UserPage';
 export { BillingPage } from './BillingPage';
+export { PerusahaanPage } from './master/PerusahaanPage';
+export { KampusPage } from './master/KampusPage';
+export { LevelUserPage } from './master/LevelUserPage';

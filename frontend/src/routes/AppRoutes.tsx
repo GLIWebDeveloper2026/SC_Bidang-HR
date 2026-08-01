@@ -1,7 +1,18 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout';
 import { ProtectedRoute } from './ProtectedRoute';
-import { LoginPage, DashboardPage, NotFoundPage, AccountPage, UserPage, BillingPage } from '@/pages';
+import {
+  LoginPage,
+  DashboardPage,
+  NotFoundPage,
+  LowonganPage,
+  LamaranPage,
+  UserPage,
+  BillingPage,
+  PerusahaanPage,
+  KampusPage,
+  LevelUserPage,
+} from '@/pages';
 
 export function AppRoutes() {
   return (
@@ -14,9 +25,12 @@ export function AppRoutes() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          {/* Account page */}
-          <Route path="/account" element={<AccountPage />} />
+          <Route path="/lowongan" element={<LowonganPage />} />
+          <Route path="/lamaran" element={<LamaranPage />} />
           <Route path="/user" element={<UserPage />} />
+          <Route path="/master/perusahaan" element={<PerusahaanPage />} />
+          <Route path="/master/kampus" element={<KampusPage />} />
+          <Route path="/master/level-user" element={<LevelUserPage />} />
           <Route path="/users/:id" element={<DashboardPage />} />
           <Route path="/billing" element={<BillingPage />} />
           <Route path="/blog" element={<DashboardPage />} />

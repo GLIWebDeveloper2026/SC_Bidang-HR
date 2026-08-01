@@ -1003,9 +1003,8 @@ export function UserPage() {
           >
             <MenuItem value="all">All Roles</MenuItem>
             <MenuItem value="Admin">Admin</MenuItem>
-            <MenuItem value="Developer">Developer</MenuItem>
-            <MenuItem value="Engineer">Engineer</MenuItem>
-            <MenuItem value="Super Admin">Super Admin</MenuItem>
+            <MenuItem value="Developer">HR</MenuItem>
+            <MenuItem value="Engineer">Applicant</MenuItem>
           </Select>
         </FormControl>
         <FormControl fullWidth size="small" sx={{ mb: 2 }}>

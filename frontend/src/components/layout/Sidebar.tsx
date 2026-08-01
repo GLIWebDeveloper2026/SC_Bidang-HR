@@ -4,25 +4,18 @@ import {
   List,
   Typography,
   Avatar,
-  Button,
   IconButton,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
   Group as GroupIcon,
-  Receipt as ReceiptIcon,
-  Article as ArticleIcon,
-  Settings as SettingsIcon,
-  Widgets as WidgetsIcon,
-  Extension as ExtensionIcon,
-  Description as DescriptionIcon,
+  Folder as FolderIcon,
   MoreHoriz as MoreHorizIcon,
-  OpenInNew as OpenInNewIcon,
-  KeyboardArrowRight as ArrowRightIcon,
 } from '@mui/icons-material';
 import { NavItem } from './NavItem';
 import { useAuth } from '@/hooks';
+import logoLockupLight from '@/assets/logo-lockup.svg';
 
 export const DRAWER_WIDTH = 254;
 
@@ -34,6 +27,7 @@ interface SidebarProps {
 
 export function Sidebar({ open, onClose, variant }: SidebarProps) {
   const { user } = useAuth();
+  const displayName = user?.displayName || user?.name || user?.email || 'User';
 
   const mainNavItems = [
     {
@@ -42,8 +36,13 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
       icon: <DashboardIcon fontSize="small" />,
     },
     {
-      label: 'Account',
-      path: '/account',
+      label: 'Lowongan',
+      path: '/lowongan',
+      icon: <PersonIcon fontSize="small" />,
+    },
+    {
+      label: 'Lamaran',
+      path: '/lamaran',
       icon: <PersonIcon fontSize="small" />,
     },
     {
@@ -51,51 +50,27 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
       path: '/user',
       icon: <GroupIcon fontSize="small" />,
     },
-    {
-      label: 'Billing',
-      path: '/billing',
-      icon: <ReceiptIcon fontSize="small" />,
-    },
-    {
-      label: 'Blog',
-      path: '/blog',
-      icon: <ArticleIcon fontSize="small" />,
-    },
-    {
-      label: 'Setting',
-      path: '/settings',
-      icon: <SettingsIcon fontSize="small" />,
-    },
+    // {
+    //   label: 'Billing',
+    //   path: '/billing',
+    //   icon: <ReceiptIcon fontSize="small" />,
+    // },
+    // {
+    //   label: 'Blog',
+    //   path: '/blog',
+    //   icon: <ArticleIcon fontSize="small" />,
+    // },
+    // {
+    //   label: 'Setting',
+    //   path: '/settings',
+    //   icon: <SettingsIcon fontSize="small" />,
+    // },
   ];
 
-  const uiElementsChildren = [
-    { label: 'Data Display', path: '/ui/data-display' },
-    { label: 'Feedback', path: '/ui/feedback' },
-    { label: 'Inputs', path: '/ui/inputs' },
-    { label: 'Navigation', path: '/ui/navigation' },
-    { label: 'Surface', path: '/ui/surface' },
-    { label: 'Utils', path: '/ui/utils' },
-  ];
-
-  const pluginsChildren = [
-    { label: 'Color Picker', path: '/plugins/color-picker' },
-    { label: 'Calendar', path: '/plugins/calendar' },
-    { label: 'Dropzone', path: '/plugins/dropzone' },
-    { label: 'Quill Editor', path: '/plugins/quill-editor' },
-    { label: 'Chart', path: '/plugins/chart' },
-    { label: 'TanStack Table', path: '/plugins/tanstack-table' },
-  ];
-
-  const pageChildren = [
-    { label: 'Authentication', path: '/pages/auth' },
-    { label: 'Onboarding', path: '/pages/onboarding' },
-    { label: 'Sample Page', path: '/pages/sample' },
-  ];
-
-  const otherChildren = [
-    { label: 'Changelog', path: '/changelog' },
-    { label: 'Documentation', path: '/documentation' },
-    { label: 'Support', path: '/support' },
+  const masterChildren = [
+    { label: 'Perusahaan', path: '/master/perusahaan' },
+    { label: 'Kampus', path: '/master/kampus' },
+    { label: 'Level User', path: '/master/level-user' },
   ];
 
   const drawerContent = (
@@ -112,43 +87,24 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          px: 2.5,
+          justifyContent: 'flex-end',
+          px: 2,
           py: 2,
           minHeight: 76,
         }}
       >
         <Box
+          component="img"
+          src={logoLockupLight}
+          alt="KerjaKink"
           sx={{
-            width: 32,
-            height: 32,
-            borderRadius: 1,
-            bgcolor: 'primary.main',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mr: 1.5,
+            display: 'block',
+            width: 210,
+            maxWidth: '100%',
+            height: 'auto',
+            flexShrink: 0,
           }}
-        >
-          <Typography
-            sx={{
-              color: 'white',
-              fontWeight: 700,
-              fontSize: '1.25rem',
-            }}
-          >
-            S
-          </Typography>
-        </Box>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            color: 'text.primary',
-            letterSpacing: '-0.5px',
-          }}
-        >
-          SaasAble
-        </Typography>
+        />
       </Box>
 
       {/* User Profile Card */}
@@ -176,21 +132,23 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
               fontWeight: 600,
             }}
           >
-            {user?.name?.charAt(0) || 'J'}
+            {displayName.charAt(0).toUpperCase()}
           </Avatar>
           <Box sx={{ ml: 1.5, flex: 1, minWidth: 0 }}>
             <Typography
               variant="subtitle2"
+              noWrap
               sx={{
                 fontWeight: 600,
                 color: 'text.primary',
                 lineHeight: 1.2,
               }}
             >
-              {user?.name || 'John Charly'}
+              {displayName}
             </Typography>
             <Typography
               variant="caption"
+              noWrap
               sx={{
                 color: 'text.secondary',
                 display: 'block',
@@ -236,18 +194,13 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
 
         <List component="nav" disablePadding sx={{ mt: 1 }}>
           <NavItem
-            label="UI Elements"
-            icon={<WidgetsIcon fontSize="small" />}
-            children={uiElementsChildren}
-          />
-          <NavItem
-            label="Plugins"
-            icon={<ExtensionIcon fontSize="small" />}
-            children={pluginsChildren}
+            label="Master"
+            icon={<FolderIcon fontSize="small" />}
+            children={masterChildren}
           />
         </List>
 
-        <List component="nav" disablePadding sx={{ mt: 1 }}>
+        {/* <List component="nav" disablePadding sx={{ mt: 1 }}>
           <NavItem
             label="Page"
             icon={<DescriptionIcon fontSize="small" />}
@@ -258,9 +211,9 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
             icon={<MoreHorizIcon fontSize="small" />}
             children={otherChildren}
           />
-        </List>
+        </List> */}
 
-        <List component="nav" disablePadding sx={{ mt: 1 }}>
+        {/* <List component="nav" disablePadding sx={{ mt: 1 }}>
           <NavItem
             label="Menu Levels"
             icon={<ArrowRightIcon fontSize="small" />}
@@ -269,7 +222,7 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
               { label: 'Level 2', path: '/menu/level2' },
             ]}
           />
-        </List>
+        </List> */}
       </Box>
 
       {/* Version Badge */}
@@ -285,58 +238,6 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
         </Typography>
       </Box>
 
-      {/* Upgrade Card */}
-      <Box sx={{ p: 2 }}>
-        <Box
-          sx={{
-            p: 2,
-            borderRadius: 3,
-            bgcolor: (theme) =>
-              theme.palette.mode === 'light'
-                ? 'rgba(96, 107, 223, 0.08)'
-                : 'rgba(189, 194, 255, 0.08)',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? 'rgba(96, 107, 223, 0.2)'
-                : 'rgba(189, 194, 255, 0.2)',
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            sx={{
-              fontWeight: 600,
-              color: 'text.primary',
-              mb: 0.5,
-            }}
-          >
-            Upgrade Your Experience
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              display: 'block',
-              mb: 2,
-              lineHeight: 1.5,
-            }}
-          >
-            Take your experience to the next level with our premium offering. Buy now and enjoy more!
-          </Typography>
-          <Button
-            variant="contained"
-            size="small"
-            fullWidth
-            endIcon={<OpenInNewIcon fontSize="small" />}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 600,
-            }}
-          >
-            Buy Now
-          </Button>
-        </Box>
-      </Box>
     </Box>
   );
 
