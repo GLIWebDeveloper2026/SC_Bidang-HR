@@ -17,7 +17,12 @@ class AuthController {
         data: result
       });
     } catch (error) {
-      return res.status(400).json({ success: false, message: error.message });
+      console.error('Register error:', error);
+      let errorMessage = error.message;
+      if (typeof errorMessage === 'object') errorMessage = JSON.stringify(errorMessage);
+      else if (!errorMessage) errorMessage = typeof error === 'string' ? error : JSON.stringify(error);
+      
+      return res.status(400).json({ success: false, message: errorMessage, error: error });
     }
   }
   async login(req, res) {
