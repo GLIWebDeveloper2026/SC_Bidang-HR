@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"><style>body{margin:0;background:#F5F2FA;font-family:Poppins,system-ui,sans-serif;color:#1B1B1F;-webkit-font-smoothing:antialiased}*{box-sizing:border-box}a{color:#606BDF;text-decoration:none}a:hover{color:#4A54B3}input,button{font-family:inherit}input:focus{outline:none;border-color:#606BDF}:focus-visible{outline:2px solid #606BDF;outline-offset:2px}</style></helmet>
+
+<header style="position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #DFDBE8">
+<div style="max-width:1200px;margin:0 auto;padding:14px clamp(16px,4vw,40px);display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+<div style="display:flex;align-items:center;gap:10px;margin-right:auto">
+<svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="display:block;flex:0 0 auto" aria-hidden="true"><path d="M6 3.5v23" stroke="#1B1B1F" stroke-width="4.5"></path><path d="M7.6 15.4 23.6 4.2" stroke="#606BDF" stroke-width="4.5"></path><path d="M7.6 15.4 23.6 26.6" stroke="#1B1B1F" stroke-width="4.5"></path></svg>
+<span style="font-size:18px;letter-spacing:-0.5px;white-space:nowrap;color:#1B1B1F;margin-left:-13px"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">K</span><span style="font-weight:700">erja</span><span style="font-weight:400">Kink</span></span>
+<span style="font-size:11px;font-weight:500;color:#237804;background:#F6FFED;border:1px solid #B7EB8F;padding:2px 7px;border-radius:4px">BKK Kampus</span>
+</div>
+<nav style="display:flex;align-items:center;gap:clamp(14px,2vw,26px);flex-wrap:wrap;font-size:14px;color:#6B6B6F">
+<a href="#lowongan" style="color:#6B6B6F">Lowongan</a>
+<a href="#peran" style="color:#6B6B6F">Untuk Siapa</a>
+<a href="#alur" style="color:#6B6B6F">Cara Kerja</a>
+<a href="#tracer" style="color:#6B6B6F">Tracer Study</a>
+</nav>
+<div style="display:flex;align-items:center;gap:10px">
+<button style="background:#fff;color:#1B1B1F;border:1px solid #DFDBE8;padding:9px 16px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#EDEDFB;border-color:#606BDF;color:#4A54B3">Masuk</button>
+<button style="background:#606BDF;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Daftar Gratis</button>
+</div>
+</div>
+</header>
+
+<section style="background:#fff;border-bottom:1px solid #DFDBE8">
+<div style="max-width:1200px;margin:0 auto;padding:clamp(32px,5vw,68px) clamp(16px,4vw,40px);display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:clamp(28px,4vw,56px);align-items:center">
+<div>
+<div style="display:inline-flex;align-items:center;gap:8px;background:#EDEDFB;color:#4A54B3;font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:20px;margin-bottom:20px">
+<span style="width:6px;height:6px;background:#606BDF;border-radius:50%"></span>Satu pintu resmi bursa kerja kampus
+</div>
+<h1 style="font-size:clamp(32px,4.4vw,52px);line-height:1.1;font-weight:700;letter-spacing:-1.2px;margin:0 0 18px;text-wrap:balance">Cari kerja, rekrut, dan rekam data alumni di satu tempat.</h1>
+<p style="font-size:clamp(15px,1.3vw,17px);line-height:1.6;color:#6B6B6F;margin:0 0 26px;max-width:52ch;text-wrap:pretty">KerjaKink menggantikan lowongan yang tersebar di grup WhatsApp dan lamaran yang tercecer di email pribadi. Lowongan terverifikasi, berkas aman, dan data penyerapan alumni terekam otomatis untuk akreditasi.</p>
+<div style="background:#F5F2FA;border:1px solid #DFDBE8;border-radius:10px;padding:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+<input type="text" placeholder="Posisi atau kata kunci" style="flex:1 1 180px;min-width:0;border:1px solid #DFDBE8;background:#fff;border-radius:6px;padding:11px 13px;font-size:14px;color:#1B1B1F"/>
+<input type="text" placeholder="Lokasi" style="flex:1 1 130px;min-width:0;border:1px solid #DFDBE8;background:#fff;border-radius:6px;padding:11px 13px;font-size:14px;color:#1B1B1F"/>
+<button style="flex:0 0 auto;background:#606BDF;color:#fff;border:none;border-radius:6px;padding:12px 22px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Cari Lowongan</button>
+</div>
+<p style="font-size:13px;color:#9A9AA1;margin:0 0 26px">Tanpa login. Filter bidang, lokasi, dan jenis pekerjaan tersedia langsung.</p>
+<sc-if value="{{ showStats }}" hint-placeholder-val="{{ true }}">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:#DFDBE8;border:1px solid #DFDBE8;border-radius:8px;overflow:hidden">
+<div style="background:#fff;padding:16px 18px"><div style="font-size:24px;font-weight:600;letter-spacing:-0.5px">1.284</div><div style="font-size:12.5px;color:#9A9AA1;margin-top:2px">Lowongan aktif</div></div>
+<div style="background:#fff;padding:16px 18px"><div style="font-size:24px;font-weight:600;letter-spacing:-0.5px">312</div><div style="font-size:12.5px;color:#9A9AA1;margin-top:2px">Perusahaan terverifikasi</div></div>
+<div style="background:#fff;padding:16px 18px"><div style="font-size:24px;font-weight:600;letter-spacing:-0.5px">76%</div><div style="font-size:12.5px;color:#9A9AA1;margin-top:2px">Serapan alumni 2 tahun</div></div>
+</div>
+</sc-if>
+</div>
+<div style="min-width:0">
+<svg viewBox="0 0 600 480" style="width:100%;height:auto;display:block" role="img" aria-label="Ilustrasi kartu lowongan, grafik serapan alumni, dan tahapan seleksi">
+<defs><pattern id="kkdots" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#8B93E8"></circle></pattern></defs>
+<rect x="70" y="26" width="470" height="360" fill="#EDEDFB"></rect>
+<rect x="18" y="322" width="170" height="130" fill="url(#kkdots)"></rect>
+<rect x="470" y="30" width="14" height="14" fill="#606BDF"></rect>
+<rect x="494" y="54" width="14" height="14" fill="#8B93E8"></rect>
+<rect x="94" y="46" width="300" height="168" rx="10" fill="#fff" stroke="#DFDBE8" stroke-width="2" opacity="0.75"></rect>
+<rect x="60" y="72" width="316" height="172" rx="10" fill="#fff" stroke="#DFDBE8" stroke-width="2"></rect>
+<rect x="84" y="96" width="52" height="52" rx="8" fill="#606BDF"></rect>
+<circle cx="140" cy="98" r="8" fill="#FF4D4F"></circle>
+<rect x="150" y="102" width="140" height="13" rx="3" fill="#1B1B1F"></rect>
+<rect x="150" y="126" width="96" height="10" rx="3" fill="#9A9AA1"></rect>
+<rect x="286" y="98" width="66" height="22" rx="11" fill="#F6FFED" stroke="#B7EB8F" stroke-width="1.5"></rect>
+<circle cx="300" cy="109" r="3.5" fill="#237804"></circle>
+<rect x="308" y="105" width="34" height="8" rx="3" fill="#237804"></rect>
+<rect x="84" y="172" width="84" height="24" rx="6" fill="#EDEDFB"></rect>
+<rect x="176" y="172" width="66" height="24" rx="6" fill="#FFFBE6"></rect>
+<rect x="250" y="172" width="102" height="24" rx="6" fill="#F5F2FA" stroke="#DFDBE8" stroke-width="1.5"></rect>
+<rect x="300" y="246" width="250" height="150" rx="10" fill="#fff" stroke="#DFDBE8" stroke-width="2"></rect>
+<rect x="322" y="268" width="96" height="10" rx="3" fill="#1B1B1F"></rect>
+<rect x="322" y="286" width="58" height="8" rx="3" fill="#9A9AA1"></rect>
+<rect x="322" y="336" width="24" height="34" fill="#8B93E8"></rect>
+<rect x="356" y="320" width="24" height="50" fill="#606BDF"></rect>
+<rect x="390" y="330" width="24" height="40" fill="#8B93E8"></rect>
+<rect x="424" y="306" width="24" height="64" fill="#606BDF"></rect>
+<rect x="458" y="316" width="24" height="54" fill="#8B93E8"></rect>
+<rect x="492" y="296" width="24" height="74" fill="#606BDF"></rect>
+<line x1="322" y1="372" x2="528" y2="372" stroke="#DFDBE8" stroke-width="2"></line>
+<rect x="30" y="252" width="212" height="112" rx="10" fill="#fff" stroke="#DFDBE8" stroke-width="2"></rect>
+<path d="M62 364 L62 386 L88 364 Z" fill="#fff"></path>
+<path d="M62 364 L62 386 L88 364" fill="none" stroke="#DFDBE8" stroke-width="2"></path>
+<rect x="54" y="276" width="120" height="10" rx="3" fill="#9A9AA1"></rect>
+<rect x="54" y="294" width="80" height="10" rx="3" fill="#DFDBE8"></rect>
+<circle cx="62" cy="332" r="7" fill="#606BDF"></circle>
+<circle cx="86" cy="332" r="7" fill="#7A83E3"></circle>
+<circle cx="110" cy="332" r="7" fill="#C6CAF3"></circle>
+<line x1="76" y1="432" x2="446" y2="432" stroke="#DFDBE8" stroke-width="2"></line>
+<circle cx="76" cy="432" r="14" fill="#606BDF"></circle>
+<path d="M70 432 l4 5 l8 -10" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path>
+<circle cx="199" cy="432" r="14" fill="#606BDF"></circle>
+<path d="M193 432 l4 5 l8 -10" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path>
+<circle cx="322" cy="432" r="14" fill="#fff" stroke="#606BDF" stroke-width="2.5"></circle>
+<circle cx="322" cy="432" r="5" fill="#606BDF"></circle>
+<circle cx="446" cy="432" r="14" fill="#fff" stroke="#DFDBE8" stroke-width="2.5"></circle>
+</svg>
+</div>
+</div>
+</section>
+
+<section id="lowongan" style="max-width:1200px;margin:0 auto;padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px)">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:24px">
+<div>
+<h2 style="font-size:clamp(24px,2.6vw,32px);font-weight:600;letter-spacing:-0.7px;margin:0 0 8px">Lowongan terbaru</h2>
+<p style="font-size:14.5px;color:#6B6B6F;margin:0">Satu lowongan bisa memuat beberapa posisi dengan kuota berbeda. Lowongan kadaluarsa otomatis disembunyikan.</p>
+</div>
+<a href="#lowongan" style="font-size:14px;font-weight:500">Lihat semua lowongan →</a>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+<button style="background:#606BDF;color:#fff;border:1px solid #606BDF;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3;border-color:#4A54B3">Semua bidang</button>
+<button style="background:#fff;color:#6B6B6F;border:1px solid #DFDBE8;padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer" style-hover="border-color:#606BDF;color:#4A54B3;background:#EDEDFB">Teknologi Informasi</button>
+<button style="background:#fff;color:#6B6B6F;border:1px solid #DFDBE8;padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer" style-hover="border-color:#606BDF;color:#4A54B3;background:#EDEDFB">Keuangan</button>
+<button style="background:#fff;color:#6B6B6F;border:1px solid #DFDBE8;padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer" style-hover="border-color:#606BDF;color:#4A54B3;background:#EDEDFB">Desain</button>
+<button style="background:#fff;color:#6B6B6F;border:1px solid #DFDBE8;padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer" style-hover="border-color:#606BDF;color:#4A54B3;background:#EDEDFB">Magang</button>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:16px">
+<sc-for list="{{ jobs }}" as="job" hint-placeholder-count="6">
+<article style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px" style-hover="border-color:#606BDF;box-shadow:0 4px 14px rgba(96,107,223,0.12)">
+<div style="display:flex;align-items:flex-start;gap:12px">
+<div style="width:42px;height:42px;flex:0 0 auto;background:#EDEDFB;color:#4A54B3;border-radius:8px;display:grid;place-items:center;font-size:15px;font-weight:600">{{ job.initial }}</div>
+<div style="min-width:0;flex:1">
+<h3 style="font-size:15.5px;font-weight:600;margin:0 0 3px;line-height:1.3">{{ job.title }}</h3>
+<p style="font-size:13px;color:#6B6B6F;margin:0">{{ job.company }}</p>
+</div>
+</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<span style="font-size:12px;color:#6B6B6F;background:#F5F2FA;border:1px solid #DFDBE8;padding:4px 9px;border-radius:5px">{{ job.location }}</span>
+<span style="font-size:12px;color:#6B6B6F;background:#F5F2FA;border:1px solid #DFDBE8;padding:4px 9px;border-radius:5px">{{ job.type }}</span>
+<span style="font-size:12px;color:#4A54B3;background:#EDEDFB;padding:4px 9px;border-radius:5px">{{ job.slots }}</span>
+</div>
+<div style="height:1px;background:#DFDBE8"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<div>
+<div style="font-size:11.5px;color:#9A9AA1">Batas lamaran</div>
+<div style="font-size:13px;font-weight:500">{{ job.deadline }}</div>
+</div>
+<sc-if value="{{ job.aktif }}" hint-placeholder-val="{{ true }}">
+<span style="font-size:12px;font-weight:500;color:#237804;background:#F6FFED;border:1px solid #B7EB8F;padding:4px 10px;border-radius:5px">Aktif</span>
+</sc-if>
+<sc-if value="{{ job.hampirPenuh }}">
+<span style="font-size:12px;font-weight:500;color:#D48806;background:#FFFBE6;border:1px solid #FFE58F;padding:4px 10px;border-radius:5px">Kuota hampir penuh</span>
+</sc-if>
+</div>
+</article>
+</sc-for>
+</div>
+</section>
+
+<section id="peran" style="background:#fff;border-top:1px solid #DFDBE8;border-bottom:1px solid #DFDBE8">
+<div style="max-width:1200px;margin:0 auto;padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px)">
+<h2 style="font-size:clamp(24px,2.6vw,32px);font-weight:600;letter-spacing:-0.7px;margin:0 0 8px">Satu akun, banyak peran</h2>
+<p style="font-size:14.5px;color:#6B6B6F;margin:0 0 32px;max-width:62ch">Pengguna bisa berpindah antara peran Pelamar dan HRD tanpa logout. Admin BKK memegang kendali verifikasi dan pelaporan.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px">
+<div style="border:1px solid #DFDBE8;border-radius:10px;padding:24px;background:#F5F2FA">
+<div style="width:38px;height:38px;background:#606BDF;border-radius:8px;margin-bottom:16px;display:grid;place-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+<h3 style="font-size:17px;font-weight:600;margin:0 0 6px">Mahasiswa &amp; Alumni</h3>
+<p style="font-size:13.5px;color:#6B6B6F;line-height:1.6;margin:0 0 14px">Melamar sekali, terpantau seterusnya.</p>
+<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:#6B6B6F">
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Cari &amp; filter lowongan tanpa login</li>
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Snapshot CV saat mengirim lamaran</li>
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Riwayat &amp; status lamaran yang privat</li>
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Notifikasi real-time tiap perubahan</li>
+</ul>
+</div>
+<div style="border:1px solid #DFDBE8;border-radius:10px;padding:24px;background:#F5F2FA">
+<div style="width:38px;height:38px;background:#606BDF;border-radius:8px;margin-bottom:16px;display:grid;place-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+<h3 style="font-size:17px;font-weight:600;margin:0 0 6px">HRD Perusahaan</h3>
+<p style="font-size:13.5px;color:#6B6B6F;line-height:1.6;margin:0 0 14px">Kelola rekrutmen sampai kuota penuh.</p>
+<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:#6B6B6F">
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Banyak posisi &amp; kuota per lowongan</li>
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Tahapan seleksi dinamis, 2 sampai 7+</li>
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Pindahkan kandidat antar tahapan</li>
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Penutupan otomatis saat kuota terisi</li>
+</ul>
+</div>
+<div style="border:1px solid #DFDBE8;border-radius:10px;padding:24px;background:#F5F2FA">
+<div style="width:38px;height:38px;background:#606BDF;border-radius:8px;margin-bottom:16px;display:grid;place-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
+<h3 style="font-size:17px;font-weight:600;margin:0 0 6px">Admin BKK</h3>
+<p style="font-size:13.5px;color:#6B6B6F;line-height:1.6;margin:0 0 14px">Jaga kualitas lowongan, siapkan akreditasi.</p>
+<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:#6B6B6F">
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Antrean verifikasi perusahaan baru</li>
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Setujui, tolak, atau blacklist</li>
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Dashboard serapan &amp; waktu tunggu</li>
+<li style="display:flex;gap:9px"><span style="color:#606BDF;font-weight:600">·</span>Unduh laporan tracer study 2 tahun</li>
+</ul>
+</div>
+</div>
+<div style="margin-top:28px;border:1px solid #DFDBE8;border-radius:10px;background:#fff;padding:20px;display:flex;gap:18px;flex-wrap:wrap;align-items:center">
+<span style="font-size:13.5px;font-weight:500;color:#1B1B1F">Status verifikasi perusahaan:</span>
+<span style="font-size:12.5px;font-weight:500;color:#237804;background:#F6FFED;border:1px solid #B7EB8F;padding:5px 11px;border-radius:5px">Verified · boleh memasang lowongan</span>
+<span style="font-size:12.5px;font-weight:500;color:#D48806;background:#FFFBE6;border:1px solid #FFE58F;padding:5px 11px;border-radius:5px">Pending · menunggu dokumen diperiksa</span>
+<span style="font-size:12.5px;font-weight:500;color:#CF1322;background:#FFF1F0;border:1px solid #FFA39E;padding:5px 11px;border-radius:5px">Blacklist · diblokir dari portal</span>
+</div>
+</div>
+</section>
+
+<section id="alur" style="max-width:1200px;margin:0 auto;padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px)">
+<h2 style="font-size:clamp(24px,2.6vw,32px);font-weight:600;letter-spacing:-0.7px;margin:0 0 8px">Empat langkah dari pencarian ke diterima</h2>
+<p style="font-size:14.5px;color:#6B6B6F;margin:0 0 32px;max-width:62ch">Alur pelamar dirancang agar tidak ada berkas hilang dan tidak ada status yang bocor ke pelamar lain.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:16px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-top:3px solid #606BDF;border-radius:8px;padding:22px">
+<div style="font-size:12px;font-weight:600;color:#606BDF;letter-spacing:1px;margin-bottom:10px">01</div>
+<h3 style="font-size:16px;font-weight:600;margin:0 0 8px">Jelajahi lowongan</h3>
+<p style="font-size:13.5px;color:#6B6B6F;line-height:1.6;margin:0">Cari tanpa akun. Buka detail untuk melihat posisi, kuota, dan tahapan seleksi.</p>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-top:3px solid #606BDF;border-radius:8px;padding:22px">
+<div style="font-size:12px;font-weight:600;color:#606BDF;letter-spacing:1px;margin-bottom:10px">02</div>
+<h3 style="font-size:16px;font-weight:600;margin:0 0 8px">Lengkapi profil &amp; CV</h3>
+<p style="font-size:13.5px;color:#6B6B6F;line-height:1.6;margin:0">Data diri, pendidikan, pengalaman, dan satu CV utama yang bisa dipakai berulang.</p>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-top:3px solid #606BDF;border-radius:8px;padding:22px">
+<div style="font-size:12px;font-weight:600;color:#606BDF;letter-spacing:1px;margin-bottom:10px">03</div>
+<h3 style="font-size:16px;font-weight:600;margin:0 0 8px">Kirim lamaran</h3>
+<p style="font-size:13.5px;color:#6B6B6F;line-height:1.6;margin:0">Pilih posisi dan tulis surat lamaran. CV disalin sebagai snapshot, aman dari perubahan profil.</p>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-top:3px solid #606BDF;border-radius:8px;padding:22px">
+<div style="font-size:12px;font-weight:600;color:#606BDF;letter-spacing:1px;margin-bottom:10px">04</div>
+<h3 style="font-size:16px;font-weight:600;margin:0 0 8px">Pantau status</h3>
+<p style="font-size:13.5px;color:#6B6B6F;line-height:1.6;margin:0">Notifikasi real-time saat berpindah tahap. Penolakan hanya terlihat oleh pelamar terkait.</p>
+</div>
+</div>
+</section>
+
+<section id="tracer" style="background:#fff;border-top:1px solid #DFDBE8">
+<div style="max-width:1200px;margin:0 auto;padding:clamp(36px,5vw,64px) clamp(16px,4vw,40px);display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:clamp(28px,4vw,52px);align-items:center">
+<div>
+<div style="display:inline-block;font-size:12px;font-weight:600;color:#4A54B3;background:#EDEDFB;padding:5px 11px;border-radius:5px;margin-bottom:16px">Fase 4 · Analitik</div>
+<h2 style="font-size:clamp(24px,2.6vw,32px);font-weight:600;letter-spacing:-0.7px;margin:0 0 14px">Tracer study yang mengisi dirinya sendiri</h2>
+<p style="font-size:14.5px;color:#6B6B6F;line-height:1.65;margin:0 0 20px">Setiap kali status lamaran berubah menjadi <strong style="color:#237804;font-weight:600">Diterima</strong>, sistem mencatat tanggal lulus, tanggal melamar, tanggal diterima, bidang pekerjaan, dan gaji awal ke tabel riwayat. Tidak ada lagi rekap manual menjelang akreditasi.</p>
+<ul style="margin:0 0 24px;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;font-size:14px;color:#6B6B6F">
+<li style="display:flex;gap:10px"><span style="color:#606BDF">▪</span>Grafik serapan alumni, waktu tunggu, dan sebaran bidang</li>
+<li style="display:flex;gap:10px"><span style="color:#606BDF">▪</span>Rata-rata gaji awal per bidang pekerjaan</li>
+<li style="display:flex;gap:10px"><span style="color:#606BDF">▪</span>Unduh data 2 tahun dalam format siap unggah</li>
+</ul>
+<button style="background:#606BDF;color:#fff;border:none;padding:12px 22px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Lihat contoh laporan</button>
+</div>
+<div style="border:1px solid #DFDBE8;border-radius:10px;background:#F5F2FA;padding:22px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px">
+<div><div style="font-size:14px;font-weight:600">Serapan alumni per bidang</div><div style="font-size:12px;color:#9A9AA1;margin-top:2px">Angkatan 2024 – 2026</div></div>
+<span style="font-size:12px;font-weight:500;color:#237804;background:#F6FFED;border:1px solid #B7EB8F;padding:4px 9px;border-radius:5px">Otomatis</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<sc-for list="{{ bidang }}" as="b" hint-placeholder-count="5">
+<div>
+<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#1B1B1F">{{ b.name }}</span><span style="color:#9A9AA1">{{ b.label }}</span></div>
+<div style="height:10px;background:#fff;border:1px solid #DFDBE8;border-radius:5px;overflow:hidden"><div style="height:100%;background:#606BDF;width:{{ b.pct }}"></div></div>
+</div>
+</sc-for>
+</div>
+<div style="height:1px;background:#DFDBE8;margin:20px 0"></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:14px">
+<div><div style="font-size:20px;font-weight:600">3,1 bln</div><div style="font-size:12px;color:#9A9AA1">Rata-rata waktu tunggu</div></div>
+<div><div style="font-size:20px;font-weight:600">Rp5,4 jt</div><div style="font-size:12px;color:#9A9AA1">Median gaji awal</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="background:#606BDF">
+<div style="max-width:1200px;margin:0 auto;padding:clamp(40px,5vw,68px) clamp(16px,4vw,40px);display:flex;gap:28px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+<div style="max-width:620px">
+<h2 style="font-size:clamp(24px,2.8vw,36px);font-weight:600;letter-spacing:-0.8px;color:#fff;margin:0 0 12px">Pindahkan bursa kerja kampus ke satu pintu resmi.</h2>
+<p style="font-size:15px;line-height:1.6;color:#EDEDFB;margin:0">Gratis untuk mahasiswa dan alumni. Perusahaan diverifikasi oleh Admin BKK sebelum memasang lowongan.</p>
+</div>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<button style="background:#fff;color:#4A54B3;border:none;padding:13px 24px;border-radius:6px;font-size:14.5px;font-weight:600;cursor:pointer" style-hover="background:#EDEDFB">Daftar sebagai Pelamar</button>
+<button style="background:transparent;color:#fff;border:1px solid #fff;padding:13px 24px;border-radius:6px;font-size:14.5px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3;border-color:#4A54B3">Daftar sebagai HRD</button>
+</div>
+</div>
+</section>
+
+<footer style="background:#fff;border-top:1px solid #DFDBE8">
+<div style="max-width:1200px;margin:0 auto;padding:40px clamp(16px,4vw,40px) 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:28px">
+<div>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+<svg width="26" height="26" viewBox="0 0 30 30" fill="none" style="display:block;flex:0 0 auto" aria-hidden="true"><path d="M6 3.5v23" stroke="#1B1B1F" stroke-width="4.5"></path><path d="M7.6 15.4 23.6 4.2" stroke="#606BDF" stroke-width="4.5"></path><path d="M7.6 15.4 23.6 26.6" stroke="#1B1B1F" stroke-width="4.5"></path></svg>
+<span style="font-size:15.5px;letter-spacing:-0.4px;white-space:nowrap;color:#1B1B1F;margin-left:-13px"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">K</span><span style="font-weight:700">erja</span><span style="font-weight:400">Kink</span></span>
+</div>
+<p style="font-size:13px;color:#9A9AA1;line-height:1.6;margin:0;max-width:34ch">Portal bursa kerja kampus untuk mahasiswa, alumni, perusahaan, dan Admin BKK.</p>
+</div>
+<div><div style="font-size:13px;font-weight:600;margin-bottom:12px">Pelamar</div><div style="display:flex;flex-direction:column;gap:9px;font-size:13px"><a href="#lowongan" style="color:#6B6B6F">Cari lowongan</a><a href="#alur" style="color:#6B6B6F">Cara melamar</a><a href="#peran" style="color:#6B6B6F">Profil &amp; CV</a></div></div>
+<div><div style="font-size:13px;font-weight:600;margin-bottom:12px">Perusahaan</div><div style="display:flex;flex-direction:column;gap:9px;font-size:13px"><a href="#peran" style="color:#6B6B6F">Daftar sebagai HRD</a><a href="#peran" style="color:#6B6B6F">Verifikasi perusahaan</a><a href="#alur" style="color:#6B6B6F">Kelola kandidat</a></div></div>
+<div><div style="font-size:13px;font-weight:600;margin-bottom:12px">BKK Kampus</div><div style="display:flex;flex-direction:column;gap:9px;font-size:13px"><a href="#tracer" style="color:#6B6B6F">Dashboard serapan</a><a href="#tracer" style="color:#6B6B6F">Laporan akreditasi</a><a href="#tracer" style="color:#6B6B6F">Bantuan</a></div></div>
+</div>
+<div style="border-top:1px solid #DFDBE8"><div style="max-width:1200px;margin:0 auto;padding:16px clamp(16px,4vw,40px);display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;font-size:12.5px;color:#9A9AA1"><span>© 2026 KerjaKink · Bursa Kerja Khusus Kampus</span><span>Kebijakan Privasi · Syarat Layanan</span></div></div>
+</footer>
+
+<sc-if value="{{ showChatFab }}" hint-placeholder-val="{{ true }}">
+<div style="position:fixed;right:clamp(16px,3vw,28px);bottom:clamp(16px,3vw,28px);z-index:30;display:flex;align-items:center;gap:12px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:8px;padding:9px 13px;font-size:13px;color:#6B6B6F;box-shadow:0 4px 16px rgba(0,0,0,0.08)">Tanya Asisten Karir AI</div>
+<button aria-label="Buka Asisten Karir AI" style="width:54px;height:54px;border-radius:50%;background:#606BDF;border:none;cursor:pointer;display:grid;place-items:center;box-shadow:0 6px 20px rgba(96,107,223,0.4)" style-hover="background:#4A54B3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
+</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showStats&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Konten&quot;},&quot;showChatFab&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Konten&quot;},&quot;jobCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:6,&quot;min&quot;:3,&quot;max&quot;:6,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Konten&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const all = [
+      { initial: "ND", title: "Frontend Developer", company: "PT Nusantara Digital", location: "Jakarta", type: "Full-time", slots: "3 posisi", deadline: "12 Agu 2026", aktif: true, hampirPenuh: false },
+      { initial: "KL", title: "UI/UX Designer (Magang)", company: "Kreasi Loka Studio", location: "Bandung", type: "Magang", slots: "2 posisi", deadline: "18 Agu 2026", aktif: true, hampirPenuh: false },
+      { initial: "BS", title: "Data Analyst", company: "Bank Sentra Amanah", location: "Jakarta", type: "Full-time", slots: "1 posisi", deadline: "9 Agu 2026", aktif: false, hampirPenuh: true },
+      { initial: "ST", title: "QA Engineer", company: "Sigma Teknologi", location: "Remote", type: "Kontrak", slots: "4 posisi", deadline: "25 Agu 2026", aktif: true, hampirPenuh: false },
+      { initial: "MA", title: "Staf Akuntansi", company: "CV Mitra Abadi", location: "Semarang", type: "Full-time", slots: "2 posisi", deadline: "21 Agu 2026", aktif: true, hampirPenuh: false },
+      { initial: "JT", title: "Network Engineer", company: "Jarindo Telekom", location: "Surabaya", type: "Full-time", slots: "3 posisi", deadline: "30 Agu 2026", aktif: false, hampirPenuh: true }
+    ];
+    return {
+      jobs: all.slice(0, this.props.jobCount ?? 6),
+      showStats: this.props.showStats ?? true,
+      showChatFab: this.props.showChatFab ?? true,
+      bidang: [
+        { name: "Teknologi Informasi", label: "38%", pct: "38%" },
+        { name: "Keuangan & Perbankan", label: "22%", pct: "22%" },
+        { name: "Manufaktur", label: "16%", pct: "16%" },
+        { name: "Pendidikan", label: "13%", pct: "13%" },
+        { name: "Lainnya", label: "11%", pct: "11%" }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>
