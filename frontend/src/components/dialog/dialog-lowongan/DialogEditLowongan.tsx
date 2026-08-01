@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   Box,
   Button,
@@ -11,12 +12,14 @@ import { Business as BusinessIcon } from '@mui/icons-material';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FormSelect, FormTextField } from '@/components/forms';
 import type {
+  Lowongan,
   LowonganFormData,
   LowonganStatus,
 } from '@/pages/perusahaan-page/LowonganPage';
 
-interface DialogCreateLowonganProps {
+interface DialogEditLowonganProps {
   open: boolean;
+  lowongan: Lowongan | null;
   methods: UseFormReturn<LowonganFormData>;
   kategoriOptions: string[];
   statusOptions: LowonganStatus[];
@@ -24,29 +27,63 @@ interface DialogCreateLowonganProps {
   onSubmit: (data: LowonganFormData) => void | Promise<void>;
 }
 
-export function DialogCreateLowongan({
+const getEditableValue = (value?: string | null) => {
+  if (!value || value === '-') return '';
+  return value;
+};
+
+const getInputDateValue = (value?: string | null) => {
+  if (!value || value === '-') return '';
+
+  const dateValue = value.split('T')[0];
+  return /^\d{4}-\d{2}-\d{2}$/.test(dateValue) ? dateValue : '';
+};
+
+export function DialogEditLowongan({
   open,
+  lowongan,
   methods,
   kategoriOptions,
   statusOptions,
   onClose,
   onSubmit,
-}: DialogCreateLowonganProps) {
+}: DialogEditLowonganProps) {
   const isSubmitting = methods.formState.isSubmitting;
+
+  useEffect(() => {
+    if (!open || !lowongan) return;
+
+    methods.reset({
+      posisi: getEditableValue(lowongan.posisi),
+      kategori_bidang: getEditableValue(lowongan.kategori_bidang),
+      kuota_posisi: lowongan.kuota_posisi || 1,
+      perusahaan: getEditableValue(lowongan.perusahaan),
+      lokasi_kerja: getEditableValue(lowongan.lokasi_kerja),
+      status: lowongan.status || 'Draft',
+      deskripsi: getEditableValue(lowongan.deskripsi),
+      tanggal: getInputDateValue(lowongan.tanggal_tutup),
+    });
+  }, [lowongan, methods, open]);
 
   return (
     <Dialog
       open={open}
       onClose={isSubmitting ? undefined : onClose}
-      maxWidth="sm"
+      maxWidth="md"
       fullWidth
       PaperProps={{ sx: { borderRadius: 3 } }}
     >
-      <DialogTitle sx={{ fontWeight: 600 }}>Tambah Lowongan</DialogTitle>
+      <DialogTitle sx={{ fontWeight: 600 }}>Edit Lowongan</DialogTitle>
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <DialogContent>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                gap: 2,
+              }}
+            >
               <FormTextField name="posisi" label="Posisi" placeholder="Masukkan posisi" />
               <FormSelect
                 name="kategori_bidang"
@@ -81,13 +118,19 @@ export function DialogCreateLowongan({
                 label="Status"
                 options={statusOptions.map((status) => ({ value: status, label: status }))}
               />
-              <FormTextField name="tanggal" label="Tanggal Tutup" type="date" InputLabelProps={{ shrink: true }} />
+              <FormTextField
+                name="tanggal"
+                label="Tanggal Tutup"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+              />
               <FormTextField
                 name="deskripsi"
                 label="Deskripsi"
                 placeholder="Masukkan deskripsi lowongan"
                 multiline
                 minRows={3}
+                sx={{ gridColumn: { sm: '1 / -1' } }}
               />
             </Box>
           </DialogContent>
@@ -95,8 +138,8 @@ export function DialogCreateLowongan({
             <Button onClick={onClose} color="inherit" disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" variant="contained" disabled={isSubmitting}>
-              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+            <Button type="submit" variant="contained" disabled={isSubmitting || !lowongan}>
+              {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
             </Button>
           </DialogActions>
         </form>

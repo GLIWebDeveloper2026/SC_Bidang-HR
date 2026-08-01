@@ -13,7 +13,7 @@ export function ButtonCreateLowongan({ onClick }: ButtonCreateLowonganProps) {
       onClick={onClick}
       sx={{ textTransform: 'none', fontWeight: 500, px: 2.5, py: 1 }}
     >
-      Tambah Lowongan
+      Buat Lowongan
     </Button>
   );
 }

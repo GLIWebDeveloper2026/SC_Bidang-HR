@@ -40,6 +40,12 @@ import {
   type Application,
   type ApplicationStatus,
 } from '@/api/api';
+import {
+  MobileCardLamaran,
+  getLamaranStatusColor,
+  lamaranStatusLabels,
+  type MobileLamaranCardItem,
+} from './MobileCardLamaran';
 
 export type LowonganStatus = 'Aktif' | 'Ditutup' | 'Draft';
 
@@ -64,22 +70,7 @@ export interface LamaranFormData {
   setuju_syarat: boolean;
 }
 
-interface LamaranRow {
-  id: string;
-  pelamar: string;
-  email: string;
-  nim: string;
-  jurusan: string;
-  tahunLulus: string;
-  posisi: string;
-  bidangIndustri: string;
-  judulPengumuman: string;
-  perusahaan: string;
-  status: ApplicationStatus;
-  cvUrl: string;
-  tanggal: string;
-  hiredAt: string;
-}
+type LamaranRow = MobileLamaranCardItem;
 
 type SortDirection = 'asc' | 'desc' | null;
 type SortField =
@@ -92,12 +83,6 @@ type SortField =
   | 'tanggal';
 
 const statusOptions: ApplicationStatus[] = ['IN_PROGRESS', 'HIRED', 'REJECTED'];
-
-const statusLabels: Record<ApplicationStatus, string> = {
-  IN_PROGRESS: 'Dalam Proses',
-  HIRED: 'Diterima',
-  REJECTED: 'Ditolak',
-};
 
 const getErrorMessage = (error: unknown, fallbackMessage: string) => {
   if (typeof error === 'object' && error !== null && 'response' in error) {
@@ -122,12 +107,6 @@ const formatDate = (dateStr?: string | null): string => {
     month: 'short',
     year: 'numeric',
   });
-};
-
-const getStatusColor = (status: ApplicationStatus) => {
-  if (status === 'HIRED') return 'success';
-  if (status === 'REJECTED') return 'error';
-  return 'warning';
 };
 
 const mapApplicationToLamaran = (application: Application): LamaranRow => ({
@@ -270,6 +249,10 @@ export function LamaranPage() {
     setSearchQuery('');
   };
 
+  const handleOpenCv = (cvUrl: string) => {
+    window.open(cvUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) {
       return <ArrowUpIcon sx={{ fontSize: 16, opacity: 0.3, ml: 0.5 }} />;
@@ -346,9 +329,40 @@ export function LamaranPage() {
         </Alert>
       )}
 
+      <Box sx={{ display: { xs: 'grid', md: 'none' }, gap: 1.5 }}>
+        {isLoading && (
+          <Paper
+            variant="outlined"
+            sx={{ p: 3, borderRadius: 2, display: 'flex', justifyContent: 'center', boxShadow: 'none' }}
+          >
+            <CircularProgress size={24} />
+          </Paper>
+        )}
+
+        {!isLoading && paginatedLamaran.length === 0 && (
+          <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, textAlign: 'center', boxShadow: 'none' }}>
+            <Typography variant="body2" color="text.secondary">
+              Belum ada data lamaran.
+            </Typography>
+          </Paper>
+        )}
+
+        {!isLoading &&
+          paginatedLamaran.map((item) => (
+            <MobileCardLamaran
+              key={item.id}
+              item={item}
+              expanded={expandedRows.includes(item.id)}
+              onToggleExpand={handleExpandRow}
+              onOpenCv={handleOpenCv}
+            />
+          ))}
+      </Box>
+
       <TableContainer
         component={Paper}
         sx={{
+          display: { xs: 'none', md: 'block' },
           borderRadius: 3,
           border: '1px solid',
           borderColor: 'divider',
@@ -435,9 +449,9 @@ export function LamaranPage() {
                     <TableCell>{item.perusahaan}</TableCell>
                     <TableCell>
                       <Chip
-                        label={statusLabels[item.status] || item.status}
+                        label={lamaranStatusLabels[item.status] || item.status}
                         size="small"
-                        color={getStatusColor(item.status)}
+                        color={getLamaranStatusColor(item.status)}
                         sx={{ fontWeight: 500 }}
                       />
                     </TableCell>
@@ -448,7 +462,7 @@ export function LamaranPage() {
                           <IconButton
                             size="small"
                             disabled={!item.cvUrl}
-                            onClick={() => window.open(item.cvUrl, '_blank', 'noopener,noreferrer')}
+                            onClick={() => handleOpenCv(item.cvUrl)}
                           >
                             <DocumentIcon fontSize="small" />
                           </IconButton>
@@ -572,7 +586,7 @@ export function LamaranPage() {
             <MenuItem value="all">Semua Status</MenuItem>
             {statusOptions.map((status) => (
               <MenuItem key={status} value={status}>
-                {statusLabels[status]}
+                {lamaranStatusLabels[status]}
               </MenuItem>
             ))}
           </Select>

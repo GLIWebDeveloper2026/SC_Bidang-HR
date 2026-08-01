@@ -51,23 +51,17 @@ import { z } from 'zod';
 import { createCompanyJob, getRecruitments, type Recruitment } from '@/api/api';
 import { ButtonCreateLowongan } from '@/components/button/button-lowongan/ButtonCreateLowongan';
 import { DialogCreateLowongan } from '@/components/dialog/dialog-lowongan/DialogCreateLowongan';
+import { DialogEditLowongan } from '@/components/dialog/dialog-lowongan/DialogEditLowongan';
+import {
+  MobileCardLowongan,
+  getLowonganStatusColor,
+  type MobileLowonganCardItem,
+  type MobileLowonganStatus,
+} from './MobileCardLowongan';
 
-export type LowonganStatus = 'Aktif' | 'Ditutup' | 'Draft';
+export type LowonganStatus = MobileLowonganStatus;
 
-export interface Lowongan {
-  id: string;
-  posisi: string;
-  kategori_bidang: string;
-  kuota_posisi: number;
-  perusahaan: string;
-  email: string;
-  no_telp: string;
-  lokasi_kerja: string;
-  status?: LowonganStatus;
-  deskripsi?: string;
-  tanggal_buka?: string;
-  tanggal_tutup?: string;
-}
+export interface Lowongan extends MobileLowonganCardItem {}
 
 type SortDirection = 'asc' | 'desc' | null;
 type SortField =
@@ -123,12 +117,6 @@ const formatDate = (dateStr?: string): string => {
     month: 'short',
     year: 'numeric',
   });
-};
-
-const getStatusColor = (status?: LowonganStatus) => {
-  if (status === 'Aktif') return 'success';
-  if (status === 'Ditutup') return 'default';
-  return 'warning';
 };
 
 const getLowonganStatus = (tanggalBuka?: string | null, tanggalTutup?: string | null): LowonganStatus => {
@@ -188,6 +176,8 @@ export function LowonganPage() {
   const [rowsPerPage] = useState(8);
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingLowongan, setEditingLowongan] = useState<Lowongan | null>(null);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<HTMLElement | null>(null);
   const [actionMenuLowonganId, setActionMenuLowonganId] = useState<string | null>(null);
@@ -207,6 +197,20 @@ export function LowonganPage() {
       status: 'Draft',
       deskripsi: '',
       tanggal: new Date().toISOString().split('T')[0],
+    },
+  });
+
+  const editMethods = useForm<LowonganFormData>({
+    resolver: zodResolver(lowonganSchema),
+    defaultValues: {
+      posisi: '',
+      kategori_bidang: '',
+      kuota_posisi: 1,
+      perusahaan: '',
+      lokasi_kerja: '',
+      status: 'Draft',
+      deskripsi: '',
+      tanggal: '',
     },
   });
 
@@ -380,6 +384,44 @@ export function LowonganPage() {
     }
   };
 
+  const handleOpenEditDialog = (id: string) => {
+    const selectedLowongan = lowongan.find((item) => item.id === id);
+
+    if (!selectedLowongan) return;
+
+    setEditingLowongan(selectedLowongan);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+    setEditingLowongan(null);
+    editMethods.reset();
+  };
+
+  const handleEditLowongan = (data: LowonganFormData) => {
+    if (!editingLowongan) return;
+
+    setLowongan((prev) =>
+      prev.map((item) =>
+        item.id === editingLowongan.id
+          ? {
+              ...item,
+              posisi: data.posisi,
+              kategori_bidang: data.kategori_bidang,
+              kuota_posisi: data.kuota_posisi,
+              perusahaan: data.perusahaan,
+              lokasi_kerja: data.lokasi_kerja,
+              status: data.status || item.status,
+              deskripsi: data.deskripsi || '-',
+              tanggal_tutup: data.tanggal || undefined,
+            }
+          : item
+      )
+    );
+    handleCloseEditDialog();
+  };
+
   const confirmDelete = () => {
     setLowongan((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
     setSelectedIds([]);
@@ -502,9 +544,45 @@ export function LowonganPage() {
         </Alert>
       )}
 
+      <Box sx={{ display: { xs: 'grid', md: 'none' }, gap: 1.5 }}>
+        {isLoading && (
+          <Paper
+            variant="outlined"
+            sx={{ p: 3, borderRadius: 2, display: 'flex', justifyContent: 'center', boxShadow: 'none' }}
+          >
+            <CircularProgress size={24} />
+          </Paper>
+        )}
+
+        {!isLoading && paginatedLowongan.length === 0 && (
+          <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, textAlign: 'center', boxShadow: 'none' }}>
+            <Typography variant="body2" color="text.secondary">
+              Belum ada data lowongan.
+            </Typography>
+          </Paper>
+        )}
+
+        {!isLoading &&
+          paginatedLowongan.map((item) => (
+            <MobileCardLowongan
+              key={item.id}
+              item={item}
+              selected={selectedIds.includes(item.id)}
+              expanded={expandedRows.includes(item.id)}
+              onSelect={handleSelectOne}
+              onToggleExpand={handleExpandRow}
+              onOpenActions={(event, id) => {
+                setActionMenuAnchorEl(event.currentTarget);
+                setActionMenuLowonganId(id);
+              }}
+            />
+          ))}
+      </Box>
+
       <TableContainer
         component={Paper}
         sx={{
+          display: { xs: 'none', md: 'block' },
           borderRadius: 3,
           border: '1px solid',
           borderColor: 'divider',
@@ -598,7 +676,7 @@ export function LowonganPage() {
                     <Chip
                       label={item.status || '-'}
                       size="small"
-                      color={getStatusColor(item.status)}
+                      color={getLowonganStatusColor(item.status)}
                       sx={{ fontWeight: 500 }}
                     />
                   </TableCell>
@@ -746,6 +824,7 @@ export function LowonganPage() {
         </MenuItem>
         <MenuItem
           onClick={() => {
+            if (actionMenuLowonganId) handleOpenEditDialog(actionMenuLowonganId);
             setActionMenuAnchorEl(null);
             setActionMenuLowonganId(null);
           }}
@@ -832,6 +911,16 @@ export function LowonganPage() {
           methods.reset();
         }}
         onSubmit={handleAddLowongan}
+      />
+
+      <DialogEditLowongan
+        open={editDialogOpen}
+        lowongan={editingLowongan}
+        methods={editMethods}
+        kategoriOptions={allKategoriOptions}
+        statusOptions={statusOptions}
+        onClose={handleCloseEditDialog}
+        onSubmit={handleEditLowongan}
       />
 
       <Dialog

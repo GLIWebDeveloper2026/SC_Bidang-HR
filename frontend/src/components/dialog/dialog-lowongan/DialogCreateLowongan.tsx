@@ -38,7 +38,7 @@ export function DialogCreateLowongan({
     <Dialog
       open={open}
       onClose={isSubmitting ? undefined : onClose}
-      maxWidth="sm"
+      maxWidth="md"
       fullWidth
       PaperProps={{ sx: { borderRadius: 3 } }}
     >
@@ -46,7 +46,13 @@ export function DialogCreateLowongan({
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <DialogContent>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                gap: 2,
+              }}
+            >
               <FormTextField name="posisi" label="Posisi" placeholder="Masukkan posisi" />
               <FormSelect
                 name="kategori_bidang"
@@ -81,13 +87,19 @@ export function DialogCreateLowongan({
                 label="Status"
                 options={statusOptions.map((status) => ({ value: status, label: status }))}
               />
-              <FormTextField name="tanggal" label="Tanggal Tutup" type="date" InputLabelProps={{ shrink: true }} />
+              <FormTextField
+                name="tanggal"
+                label="Tanggal Tutup"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+              />
               <FormTextField
                 name="deskripsi"
                 label="Deskripsi"
                 placeholder="Masukkan deskripsi lowongan"
                 multiline
                 minRows={3}
+                sx={{ gridColumn: { sm: '1 / -1' } }}
               />
             </Box>
           </DialogContent>
