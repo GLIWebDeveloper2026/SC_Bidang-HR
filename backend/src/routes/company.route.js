@@ -12,6 +12,6 @@ router.delete('/:id', companyController.deleteCompany); // Delete Perusahaan
 
 router.post('/jobs', companyController.createJob);
 router.get('/applicants', companyController.getApplicants);
-router.patch('/applicants/:id/stage', companyController.moveApplicantStage);
+router.patch('/applicants/:id/status', companyController.updateApplicantStatus);
 
 module.exports = router;

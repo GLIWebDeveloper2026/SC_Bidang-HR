@@ -42,16 +42,20 @@ class CompanyController {
     }
   }
 
-  // PATCH /api/v1/companies/applicants/:id/stage
-  async moveApplicantStage(req, res) {
+  // PATCH /api/v1/companies/applicants/:id/status
+  async updateApplicantStatus(req, res) {
     try {
       const { id: applicationId } = req.params;
-      const { stage_id, result_status } = req.body;
+      const { result_status } = req.body;
 
-      const updated = await companyService.moveApplicantStage(applicationId, stage_id, result_status);
+      if (!result_status) {
+         return res.status(400).json({ success: false, message: 'result_status diperlukan' });
+      }
+
+      const updated = await companyService.updateApplicantStatus(applicationId, result_status);
       return res.status(200).json({
         success: true,
-        message: 'Tahapan seleksi pelamar berhasil diperbarui',
+        message: 'Status pelamar berhasil diperbarui',
         data: updated
       });
     } catch (error) {

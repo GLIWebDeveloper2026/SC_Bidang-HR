@@ -5,7 +5,8 @@ require('dotenv').config();
 const companyRoutes = require ('./src/routes/company.route')
 const profileRoutes = require('./src/routes/profile.route')
 const hrRoutes = require('./src/routes/hr.route')
-const recruitmentRoutes = require('./src/routes/recruitment.route')
+const recruitmentRoutes = require('./src/routes/recruitment.route');
+const applicationRoutes = require('./src/routes/application.route');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -15,6 +16,7 @@ app.use('/api/v1/companies', companyRoutes);
 app.use('/api/v1/profiles', profileRoutes);
 app.use('/api/v1/hr', hrRoutes);
 app.use('/api/v1/recruitments', recruitmentRoutes);
+app.use('/api/v1/applications', applicationRoutes);
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 'Online',
