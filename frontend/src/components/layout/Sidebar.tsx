@@ -29,6 +29,7 @@ interface SidebarProps {
 
 export function Sidebar({ open, onClose, variant }: SidebarProps) {
   const { user } = useAuth();
+  const displayName = user?.displayName || user?.name || user?.email || 'User';
 
   const mainNavItems = [
     {
@@ -164,7 +165,7 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
               fontWeight: 600,
             }}
           >
-            {user?.name?.charAt(0) || 'J'}
+            {displayName.charAt(0).toUpperCase()}
           </Avatar>
           <Box sx={{ ml: 1.5, flex: 1, minWidth: 0 }}>
             <Typography
@@ -175,7 +176,7 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
                 lineHeight: 1.2,
               }}
             >
-              {user?.name || 'John Charly'}
+              {displayName}
             </Typography>
             <Typography
               variant="caption"

@@ -42,6 +42,7 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const displayName = user?.displayName || user?.name || user?.email || 'User';
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -294,7 +295,7 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
               fontWeight: 600,
             }}
           >
-            {user?.name?.charAt(0) || 'J'}
+            {displayName.charAt(0).toUpperCase()}
           </Avatar>
         </IconButton>
 
@@ -317,10 +318,10 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
         >
           <Box sx={{ px: 2, py: 1.5 }}>
             <Typography variant="subtitle2" fontWeight={600}>
-              {user?.name || 'John Charly'}
+              {displayName}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {user?.email || 'john@example.com'}
+              {user?.email || '-'}
             </Typography>
           </Box>
           <Divider />

@@ -1,5 +1,19 @@
-import { createContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
-import apiClient from '@/api/client';
+import {
+  createContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+  useMemo,
+} from 'react';
+import {
+  getSupabaseUser,
+  mapSupabaseUser,
+  refreshSupabaseSession,
+  signInWithPassword,
+  signOutSupabase,
+  type SupabaseSession,
+} from '@/api/supabaseAuth';
 import type { User } from '@/types';
 
 interface AuthContextType {
@@ -9,13 +23,46 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithAccessToken: (accessToken: string) => Promise<User>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AUTH_TOKEN_KEY = 'auth_token';
+const AUTH_REFRESH_TOKEN_KEY = 'auth_refresh_token';
 const AUTH_USER_KEY = 'auth_user';
+
+function normalizeUser(user: User): User {
+  const displayName = user.displayName || user.display_name || user.name || user.email;
+
+  return {
+    ...user,
+    name: displayName,
+    displayName,
+    role: user.role || 'User',
+  };
+}
+
+function clearStoredAuth() {
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+  localStorage.removeItem(AUTH_REFRESH_TOKEN_KEY);
+  localStorage.removeItem(AUTH_USER_KEY);
+}
+
+function readUrlAuthParams() {
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const queryParams = new URLSearchParams(window.location.search);
+
+  return {
+    accessToken: hashParams.get('access_token'),
+    refreshToken: hashParams.get('refresh_token'),
+    error:
+      hashParams.get('error_description') ||
+      queryParams.get('error_description') ||
+      hashParams.get('error') ||
+      queryParams.get('error'),
+  };
+}
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -26,137 +73,140 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const clearAuthState = useCallback(() => {
+    clearStoredAuth();
+    setToken(null);
+    setUser(null);
+  }, []);
+
+  const saveSession = useCallback(async (session: SupabaseSession) => {
+    if (!session.access_token) {
+      throw new Error('Supabase tidak mengirim access token.');
+    }
+
+    const supabaseUser = session.user || (await getSupabaseUser(session.access_token));
+    const authenticatedUser = normalizeUser(mapSupabaseUser(supabaseUser));
+
+    localStorage.setItem(AUTH_TOKEN_KEY, session.access_token);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(authenticatedUser));
+
+    if (session.refresh_token) {
+      localStorage.setItem(AUTH_REFRESH_TOKEN_KEY, session.refresh_token);
+    }
+
+    setToken(session.access_token);
+    setUser(authenticatedUser);
+
+    return authenticatedUser;
+  }, []);
+
   useEffect(() => {
     const initializeAuth = async () => {
-      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-      const queryParams = new URLSearchParams(window.location.search);
-      const oauthError = hashParams.get('error_description') || queryParams.get('error_description');
-      const accessToken = hashParams.get('access_token');
+      const urlAuth = readUrlAuthParams();
 
-      if (oauthError) {
+      if (urlAuth.error) {
         window.history.replaceState(null, document.title, window.location.pathname);
-        localStorage.removeItem(AUTH_TOKEN_KEY);
-        localStorage.removeItem(AUTH_USER_KEY);
+        clearAuthState();
         setIsLoading(false);
         return;
       }
 
-      if (accessToken) {
+      if (urlAuth.accessToken) {
         try {
           window.history.replaceState(null, document.title, window.location.pathname);
-          localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
-
-          const { data } = await apiClient.get<{ success: boolean; user: User }>('/me');
-
-          if (!data.success || !data.user) {
-            throw new Error('Unable to verify Supabase session');
-          }
-
-          const authenticatedUser: User = {
-            ...data.user,
-            name: data.user.name || data.user.email,
-            role: data.user.role || 'User',
-          };
-
-          localStorage.setItem(AUTH_USER_KEY, JSON.stringify(authenticatedUser));
-          setToken(accessToken);
-          setUser(authenticatedUser);
+          await saveSession({
+            access_token: urlAuth.accessToken,
+            refresh_token: urlAuth.refreshToken || undefined,
+          });
         } catch {
-          localStorage.removeItem(AUTH_TOKEN_KEY);
-          localStorage.removeItem(AUTH_USER_KEY);
+          clearAuthState();
         } finally {
           setIsLoading(false);
         }
         return;
       }
 
-      // Check for existing session on mount
       const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
+      const storedRefreshToken = localStorage.getItem(AUTH_REFRESH_TOKEN_KEY);
       const storedUser = localStorage.getItem(AUTH_USER_KEY);
 
-      if (storedToken && storedUser) {
-        try {
-          const parsedUser = JSON.parse(storedUser);
-          setToken(storedToken);
-          setUser(parsedUser);
-        } catch {
-          // Invalid stored data, clear it
-          localStorage.removeItem(AUTH_TOKEN_KEY);
-          localStorage.removeItem(AUTH_USER_KEY);
-        }
+      if (!storedToken || !storedUser) {
+        clearAuthState();
+        setIsLoading(false);
+        return;
       }
 
-      setIsLoading(false);
+      try {
+        await getSupabaseUser(storedToken);
+        setToken(storedToken);
+        setUser(normalizeUser(JSON.parse(storedUser) as User));
+      } catch {
+        if (!storedRefreshToken) {
+          clearAuthState();
+          setIsLoading(false);
+          return;
+        }
+
+        try {
+          const refreshedSession = await refreshSupabaseSession(storedRefreshToken);
+          await saveSession(refreshedSession);
+        } catch {
+          clearAuthState();
+        }
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     void initializeAuth();
-  }, []);
+  }, [clearAuthState, saveSession]);
 
-  const login = useCallback(async (email: string, _password: string) => {
-    // Mock login - in real app, this would call the API
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+  const login = useCallback(
+    async (email: string, password: string) => {
+      setIsLoading(true);
 
-      const mockUser: User = {
-        id: '1',
-        email,
-        name: 'John Charly',
-        avatar: undefined,
-        role: 'Super Admin',
-      };
-      const mockToken = 'mock-jwt-token-' + Date.now();
-
-      localStorage.setItem(AUTH_TOKEN_KEY, mockToken);
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(mockUser));
-
-      setToken(mockToken);
-      setUser(mockUser);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const loginWithAccessToken = useCallback(async (accessToken: string) => {
-    setIsLoading(true);
-    try {
-      localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
-
-      const { data } = await apiClient.get<{ success: boolean; user: User }>('/me');
-
-      if (!data.success || !data.user) {
-        throw new Error('Unable to verify Supabase session');
+      try {
+        const session = await signInWithPassword(email, password);
+        await saveSession(session);
+      } catch (error) {
+        clearAuthState();
+        throw error;
+      } finally {
+        setIsLoading(false);
       }
+    },
+    [clearAuthState, saveSession]
+  );
 
-      const authenticatedUser: User = {
-        ...data.user,
-        name: data.user.name || data.user.email,
-        role: data.user.role || 'User',
-      };
+  const loginWithAccessToken = useCallback(
+    async (accessToken: string) => {
+      setIsLoading(true);
 
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(authenticatedUser));
-      setToken(accessToken);
-      setUser(authenticatedUser);
+      try {
+        return await saveSession({ access_token: accessToken });
+      } catch (error) {
+        clearAuthState();
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [clearAuthState, saveSession]
+  );
 
-      return authenticatedUser;
-    } catch (error) {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(AUTH_USER_KEY);
-      setToken(null);
-      setUser(null);
-      throw error;
-    } finally {
-      setIsLoading(false);
+  const logout = useCallback(async () => {
+    const activeToken = token;
+
+    clearAuthState();
+
+    if (activeToken) {
+      try {
+        await signOutSupabase(activeToken);
+      } catch {
+        // Local logout should still succeed even if the remote session is already invalid.
+      }
     }
-  }, []);
-
-  const logout = useCallback(() => {
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(AUTH_USER_KEY);
-    setToken(null);
-    setUser(null);
-  }, []);
+  }, [clearAuthState, token]);
 
   const isAuthenticated = !!token && !!user;
 
