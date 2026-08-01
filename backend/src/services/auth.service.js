@@ -1,52 +1,43 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const supabase = require('../config/supabase');
+const authRepository = require('../repository/auth.repository');
 
-const AuthRepository = require("../repositories/auth.repository");
+class AuthService {
+  async register(data) {
+    const { email, password, nama, level_id } = data;
 
-class AuthService{
+    // 1. Register di Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-    async login(data){
-
-        const user = await AuthRepository.findByEmail(data.email);
-
-        if(!user){
-
-            throw new Error("Email tidak ditemukan");
-
-        }
-
-        const valid = await bcrypt.compare(data.password,user.password);
-
-        if(!valid){
-
-            throw new Error("Password salah");
-
-        }
-
-        const token = jwt.sign({
-
-            id:user.id,
-            role:user.role
-
-        },process.env.JWT_SECRET,{
-            expiresIn:"1d"
-        });
-
-        return{
-
-            user:{
-                id:user.id,
-                name:user.name,
-                email:user.email,
-                role:user.role
-            },
-
-            token
-
-        }
-
+    if (authError) {
+      throw new Error(authError.message);
     }
 
+    const userId = authData.user?.id;
+    if (!userId) {
+      throw new Error("Gagal mendapatkan UID dari Supabase Auth");
+    }
+
+    // 2. Insert ke tabel profile (atau profiles)
+    const payloadProfile = {
+      uid: userId,
+      nama: nama,
+      email: email,
+      level_id: level_id,
+      status: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const profile = await authRepository.createProfile(payloadProfile);
+
+    return {
+      user: authData.user,
+      profile
+    };
+  }
 }
 
 module.exports = new AuthService();

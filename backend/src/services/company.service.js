@@ -20,9 +20,6 @@ class CompanyService {
     if (!payload.positions || payload.positions.length === 0) {
       throw new Error('Minimal harus mencantumkan 1 posisi pekerjaan');
     }
-    if (!payload.stages || payload.stages.length === 0) {
-      throw new Error('Tahapan seleksi rekrutmen wajib ditentukan');
-    }
 
     return await companyRepository.createRecruitment(company.uid, profileId, payload);
   }
@@ -35,8 +32,8 @@ class CompanyService {
     return await companyRepository.findApplicantsByCompany(company.uid);
   }
 
-  async moveApplicantStage(applicationId, stageId, resultStatus) {
-    return await companyRepository.updateApplicationStage(applicationId, stageId, resultStatus);
+  async updateApplicantStatus(applicationId, resultStatus) {
+    return await companyRepository.updateApplicationStatus(applicationId, resultStatus);
   }
 
   async getAllCompanies() {

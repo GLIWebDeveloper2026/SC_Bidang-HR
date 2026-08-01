@@ -6,7 +6,7 @@ const { authenticate } = require('../middlewares/auth.middleware');
 router.post('/register', authenticate, companyController.registerCompany);
 router.post('/jobs', authenticate, companyController.createJob);
 router.get('/applicants', authenticate, companyController.getApplicants);
-router.patch('/applicants/:id/stage', authenticate, companyController.moveApplicantStage);
+router.patch('/applicants/:id/status', authenticate, companyController.updateApplicantStatus);
 
 // Company CRUD
 router.get('/', companyController.getAllCompanies); // Get Semua Perusahaan

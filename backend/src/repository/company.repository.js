@@ -115,7 +115,7 @@ class CompanyRepository {
   }
 
   async createRecruitment(perusahaanId, profileId, jobData) {
-    const { judul_pengumuman, deskripsi, lokasi_kerja, tanggal_tutup, positions, stages } = jobData;
+    const { judul_pengumuman, deskripsi, lokasi_kerja, tanggal_tutup, positions } = jobData;
 
     // A. Insert Recruitment Header
     const { data: recruitment, error: recErr } = await supabase
@@ -147,18 +147,6 @@ class CompanyRepository {
 
     if (posErr) throw posErr;
 
-    const formattedStages = stages.map(stg => ({
-      recruitment_id: recruitment.uid,
-      nama_tahapan: stg.nama_tahapan,
-      urutan_tahapan: stg.urutan_tahapan
-    }));
-
-    const { error: stageErr } = await supabase
-      .from('recruitment_stages')
-      .insert(formattedStages);
-
-    if (stageErr) throw stageErr;
-
     return recruitment;
   }
 
@@ -182,8 +170,7 @@ class CompanyRepository {
           posisi,
           bidang_industri,
           recruitment!inner (uid, judul_pengumuman, perusahaan_id)
-        ),
-        recruitment_stages (nama_tahapan, urutan_tahapan)
+        )
       `)
       .eq('recruitment_positions.recruitment.perusahaan_id', perusahaanId)
       .order('created_at', { ascending: false });
@@ -192,15 +179,12 @@ class CompanyRepository {
     return data;
   }
 
-  // 5. Update Tahapan Seleksi Pelamar & Trigger Status HIRED jika Tahap Akhir
-  async updateApplicationStage(applicationId, stageId, resultStatus) {
-    const updatePayload = { current_stage_id: stageId };
+  // 5. Update Status Pelamar
+  async updateApplicationStatus(applicationId, resultStatus) {
+    const updatePayload = { status: resultStatus };
     
-    if (resultStatus) {
-      updatePayload.status = resultStatus; // 'IN_PROGRESS', 'HIRED', 'REJECTED'
-      if (resultStatus === 'HIRED') {
-        updatePayload.hired_at = new Date().toISOString();
-      }
+    if (resultStatus === 'HIRED') {
+      updatePayload.hired_at = new Date().toISOString();
     }
 
     const { data, error } = await supabase
