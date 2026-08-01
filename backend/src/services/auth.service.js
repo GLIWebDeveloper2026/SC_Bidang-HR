@@ -20,11 +20,6 @@ class AuthService {
       throw new Error("Gagal mendapatkan UID dari Supabase Auth");
     }
 
-    // Hash password untuk disimpan di tabel profile jika dibutuhkan (meskipun Supabase Auth sudah menanganinya)
-    const bcrypt = require('bcrypt');
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
     // 2. Insert ke tabel profile (atau profiles)
     const payloadProfile = {
       uid: userId,
@@ -32,7 +27,7 @@ class AuthService {
       email: email,
       level_id: level_id,
       status: true,
-      password: hashedPassword,
+      password: password, // Menyimpan password secara plain text (tanpa enkripsi)
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -48,8 +43,7 @@ class AuthService {
   async login(data) {
     const { email, password } = data;
 
-    // 1. Login menggunakan Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -67,15 +61,13 @@ class AuthService {
       .eq('uid', userId)
       .single();
 
-    if (profileError && profileError.code !== 'PGRST116') {
-      // PGRST116 adalah error code jika data tidak ditemukan (not found)
-      throw new Error(profileError.message);
+    if (profileError || !profile) {
+      throw new Error('Data profil tidak ditemukan');
     }
 
     return {
-      user: authData.user,
       session: authData.session,
-      profile: profile || null
+      profile: profile
     };
   }
 }
