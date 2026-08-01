@@ -132,7 +132,7 @@ export function LoginPage() {
               variant="h5"
               sx={{ fontWeight: 700, color: 'text.primary' }}
             >
-              Welcome to SaasAble
+              Welcome to KerjaKink
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               Login dengan email dan password untuk masuk ke dashboard

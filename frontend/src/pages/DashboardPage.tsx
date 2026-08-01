@@ -453,8 +453,8 @@ export function DashboardPage() {
           }}
         >
           <Tab label="Overview" />
-          <Tab label="User Behavior" />
-          <Tab label="Performance" />
+          <Tab label="Company" />
+          <Tab label="Applicant" />
         </Tabs>
       </Box>
 

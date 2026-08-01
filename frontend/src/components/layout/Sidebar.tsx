@@ -4,21 +4,16 @@ import {
   List,
   Typography,
   Avatar,
-  Button,
   IconButton,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
   Group as GroupIcon,
-  Receipt as ReceiptIcon,
-  Article as ArticleIcon,
   Settings as SettingsIcon,
-  Widgets as WidgetsIcon,
-  Extension as ExtensionIcon,
+  Folder as FolderIcon,
   Description as DescriptionIcon,
   MoreHoriz as MoreHorizIcon,
-  OpenInNew as OpenInNewIcon,
   KeyboardArrowRight as ArrowRightIcon,
 } from '@mui/icons-material';
 import { NavItem } from './NavItem';
@@ -42,8 +37,13 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
       icon: <DashboardIcon fontSize="small" />,
     },
     {
-      label: 'Account',
-      path: '/account',
+      label: 'Lowongan',
+      path: '/lowongan',
+      icon: <PersonIcon fontSize="small" />,
+    },
+    {
+      label: 'Lamaran',
+      path: '/lamaran',
       icon: <PersonIcon fontSize="small" />,
     },
     {
@@ -51,16 +51,16 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
       path: '/user',
       icon: <GroupIcon fontSize="small" />,
     },
-    {
-      label: 'Billing',
-      path: '/billing',
-      icon: <ReceiptIcon fontSize="small" />,
-    },
-    {
-      label: 'Blog',
-      path: '/blog',
-      icon: <ArticleIcon fontSize="small" />,
-    },
+    // {
+    //   label: 'Billing',
+    //   path: '/billing',
+    //   icon: <ReceiptIcon fontSize="small" />,
+    // },
+    // {
+    //   label: 'Blog',
+    //   path: '/blog',
+    //   icon: <ArticleIcon fontSize="small" />,
+    // },
     {
       label: 'Setting',
       path: '/settings',
@@ -68,22 +68,10 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
     },
   ];
 
-  const uiElementsChildren = [
-    { label: 'Data Display', path: '/ui/data-display' },
-    { label: 'Feedback', path: '/ui/feedback' },
-    { label: 'Inputs', path: '/ui/inputs' },
-    { label: 'Navigation', path: '/ui/navigation' },
-    { label: 'Surface', path: '/ui/surface' },
-    { label: 'Utils', path: '/ui/utils' },
-  ];
-
-  const pluginsChildren = [
-    { label: 'Color Picker', path: '/plugins/color-picker' },
-    { label: 'Calendar', path: '/plugins/calendar' },
-    { label: 'Dropzone', path: '/plugins/dropzone' },
-    { label: 'Quill Editor', path: '/plugins/quill-editor' },
-    { label: 'Chart', path: '/plugins/chart' },
-    { label: 'TanStack Table', path: '/plugins/tanstack-table' },
+  const masterChildren = [
+    { label: 'Perusahaan', path: '/master/perusahaan' },
+    { label: 'Kampus', path: '/master/kampus' },
+    { label: 'Level User', path: '/master/level-user' },
   ];
 
   const pageChildren = [
@@ -147,7 +135,7 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
             letterSpacing: '-0.5px',
           }}
         >
-          SaasAble
+          KerjaKink
         </Typography>
       </Box>
 
@@ -236,14 +224,9 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
 
         <List component="nav" disablePadding sx={{ mt: 1 }}>
           <NavItem
-            label="UI Elements"
-            icon={<WidgetsIcon fontSize="small" />}
-            children={uiElementsChildren}
-          />
-          <NavItem
-            label="Plugins"
-            icon={<ExtensionIcon fontSize="small" />}
-            children={pluginsChildren}
+            label="Master"
+            icon={<FolderIcon fontSize="small" />}
+            children={masterChildren}
           />
         </List>
 
@@ -285,58 +268,6 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
         </Typography>
       </Box>
 
-      {/* Upgrade Card */}
-      <Box sx={{ p: 2 }}>
-        <Box
-          sx={{
-            p: 2,
-            borderRadius: 3,
-            bgcolor: (theme) =>
-              theme.palette.mode === 'light'
-                ? 'rgba(96, 107, 223, 0.08)'
-                : 'rgba(189, 194, 255, 0.08)',
-            border: '1px solid',
-            borderColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? 'rgba(96, 107, 223, 0.2)'
-                : 'rgba(189, 194, 255, 0.2)',
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            sx={{
-              fontWeight: 600,
-              color: 'text.primary',
-              mb: 0.5,
-            }}
-          >
-            Upgrade Your Experience
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              display: 'block',
-              mb: 2,
-              lineHeight: 1.5,
-            }}
-          >
-            Take your experience to the next level with our premium offering. Buy now and enjoy more!
-          </Typography>
-          <Button
-            variant="contained"
-            size="small"
-            fullWidth
-            endIcon={<OpenInNewIcon fontSize="small" />}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 600,
-            }}
-          >
-            Buy Now
-          </Button>
-        </Box>
-      </Box>
     </Box>
   );
 
