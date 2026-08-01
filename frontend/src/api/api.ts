@@ -131,15 +131,73 @@ export interface UpdateProfilePayload {
   bio?: string;
 }
 
+export interface Level {
+  uid: string;
+  role: string;
+  level: number;
+  created_at?: string;
+  updated_at?: string | null;
+}
+
+export interface RegisterUserPayload {
+  email: string;
+  password: string;
+  nama: string;
+  level_id: string;
+}
+
+export interface RegisteredAuthUser {
+  id: string;
+  aud?: string;
+  role?: string;
+  email: string;
+  created_at?: string;
+}
+
+export interface RegisteredProfile {
+  uid: string;
+  nama: string;
+  email: string;
+  level_id: string;
+  status?: boolean;
+  created_at?: string;
+  updated_at?: string | null;
+}
+
+export interface RegisterUserResult {
+  user: RegisteredAuthUser;
+  profile: RegisteredProfile;
+}
+
 export const API_ENDPOINTS = {
+  authRegister: '/v1/auth/register',
   companies: '/v1/companies',
   companyRegister: '/v1/companies/register',
   companyJobs: '/v1/companies/jobs',
+  levels: '/v1/levels',
   profileMe: '/v1/profiles/me',
   profileUpdate: '/v1/profiles/update',
   recruitments: '/v1/recruitments',
   applications: '/v1/applications',
 } as const;
+
+export async function registerUser(payload: RegisterUserPayload) {
+  const { data } = await apiClient.post<ApiResponse<RegisterUserResult>>(
+    API_ENDPOINTS.authRegister,
+    payload
+  );
+  return data;
+}
+
+export async function getLevels() {
+  const { data } = await apiClient.get<ApiResponse<Level[]>>(API_ENDPOINTS.levels);
+
+  if (!data.success || !Array.isArray(data.data)) {
+    throw new Error(data.message || 'Daftar level user tidak dapat dimuat.');
+  }
+
+  return data.data;
+}
 
 export async function getCompanies() {
   const { data } = await apiClient.get<ApiResponse<Company[]>>(API_ENDPOINTS.companies);

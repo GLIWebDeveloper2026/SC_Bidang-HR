@@ -1,5 +1,6 @@
 export { DashboardPage } from './DashboardPage';
 export { LoginPage } from './LoginPage';
+export { RegisterPage } from './RegisterPage';
 export { NotFoundPage } from './NotFoundPage';
 export { LowonganPage } from './perusahaan-page/LowonganPage';
 export { LamaranPage } from './mahasiswa-page/LamaranPage';

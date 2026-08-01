@@ -27,7 +27,6 @@ class AuthService {
       email: email,
       level_id: level_id,
       status: true,
-      password: password, // Menyimpan password secara plain text (tanpa enkripsi)
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
