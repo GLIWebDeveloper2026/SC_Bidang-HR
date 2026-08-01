@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="min-height:100%;background:#F5F2FA;font-family:Poppins,system-ui,sans-serif;color:#1B1B1F;display:flex;flex-direction:column">
+
+<header style="background:#fff;border-bottom:1px solid #DFDBE8;position:sticky;top:0;z-index:12">
+<div style="max-width:1180px;margin:0 auto;padding:12px clamp(14px,3vw,28px);display:flex;align-items:center;gap:12px;flex-wrap:nowrap">
+<div onClick="{{ goHome }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;margin-right:auto;min-width:0">
+<svg width="28" height="28" viewBox="0 0 30 30" fill="none" style="display:block;flex:0 0 auto" aria-hidden="true"><path d="M6 3.5v23" stroke="#1B1B1F" stroke-width="4.5"></path><path d="M7.6 15.4 23.6 4.2" stroke="#606BDF" stroke-width="4.5"></path><path d="M7.6 15.4 23.6 26.6" stroke="#1B1B1F" stroke-width="4.5"></path></svg>
+<span style="font-size:17px;letter-spacing:-0.5px;white-space:nowrap;color:#1B1B1F;margin-left:-12px"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">K</span><span style="font-weight:700">erja</span><span style="font-weight:400">Kink</span></span>
+</div>
+<sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+<nav style="display:flex;gap:18px;font-size:13.5px;color:#6B6B6F;margin-right:14px">
+<span onClick="{{ goHome }}" style="cursor:pointer;color:{{ navHomeColor }}">Lowongan</span>
+<span onClick="{{ goRiwayat }}" style="cursor:pointer;color:{{ navRiwayatColor }}">Riwayat Lamaran</span>
+<span onClick="{{ goDash }}" style="cursor:pointer;color:{{ navDashColor }}">{{ dashLabel }}</span>
+</nav>
+</sc-if>
+<div onClick="{{ toggleNotif }}" style="position:relative;width:34px;height:34px;flex:0 0 auto;border:1px solid #DFDBE8;border-radius:6px;display:grid;place-items:center;cursor:pointer;background:#fff">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B6B6F" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+<sc-if value="{{ hasNotif }}"><span style="position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;background:#FF4D4F;color:#fff;font-size:10.5px;font-weight:600;border-radius:9px;display:grid;place-items:center;padding:0 4px">{{ notifCount }}</span></sc-if>
+</div>
+<sc-if value="{{ loggedIn }}">
+<div style="display:flex;align-items:center;gap:8px">
+<sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+<div onClick="{{ switchRole }}" style="display:flex;align-items:center;gap:7px;border:1px solid #606BDF;background:#EDEDFB;color:#4A54B3;padding:7px 11px;border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap" style-hover="background:#606BDF;color:#fff">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>{{ roleLabel }}
+</div>
+</sc-if>
+<div onClick="{{ goProfil }}" style="width:32px;height:32px;border-radius:50%;background:#EDEDFB;color:#4A54B3;display:grid;place-items:center;font-size:12.5px;font-weight:600;cursor:pointer;flex:0 0 auto">RA</div>
+</div>
+</sc-if>
+<sc-if value="{{ loggedOut }}">
+<button onClick="{{ goAuth }}" style="background:#606BDF;color:#fff;border:none;padding:9px 15px;border-radius:6px;font-size:13.5px;font-weight:500;cursor:pointer;white-space:nowrap" style-hover="background:#4A54B3">Masuk</button>
+</sc-if>
+</div>
+<sc-if value="{{ notifOpen }}">
+<div style="border-top:1px solid #DFDBE8;background:#F5F2FA">
+<div style="max-width:1180px;margin:0 auto;padding:12px clamp(14px,3vw,28px);display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ notifs }}" as="n" hint-placeholder-count="2">
+<div style="background:#fff;border:1px solid #DFDBE8;border-left:3px solid #606BDF;border-radius:6px;padding:11px 13px">
+<div style="font-size:13px;font-weight:500">{{ n.title }}</div>
+<div style="font-size:12px;color:#9A9AA1;margin-top:2px">{{ n.time }}</div>
+</div>
+</sc-for>
+<sc-if value="{{ noNotif }}"><div style="font-size:12.5px;color:#9A9AA1;padding:4px 0">Belum ada notifikasi.</div></sc-if>
+</div>
+</div>
+</sc-if>
+</header>
+
+<main style="flex:1">
+
+<sc-if value="{{ scBeranda }}" hint-placeholder-val="{{ true }}">
+<section style="background:#fff;border-bottom:1px solid #DFDBE8">
+<div style="max-width:1180px;margin:0 auto;padding:clamp(24px,3.5vw,52px) clamp(14px,3vw,28px);display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:clamp(22px,3vw,44px);align-items:center">
+<div>
+<div style="display:inline-flex;align-items:center;gap:7px;background:#EDEDFB;color:#4A54B3;font-size:12px;font-weight:500;padding:5px 11px;border-radius:20px;margin-bottom:16px"><span style="width:6px;height:6px;background:#606BDF;border-radius:50%"></span>Satu pintu resmi bursa kerja kampus</div>
+<h1 style="font-size:clamp(26px,3.4vw,44px);line-height:1.12;font-weight:700;letter-spacing:-1px;margin:0 0 14px">Cari kerja, rekrut, dan rekam data alumni di satu tempat.</h1>
+<p style="font-size:14.5px;line-height:1.6;color:#6B6B6F;margin:0 0 20px;max-width:50ch">Lowongan terverifikasi BKK, berkas lamaran aman lewat snapshot CV, dan data tracer study terekam otomatis untuk akreditasi.</p>
+<div style="background:#F5F2FA;border:1px solid #DFDBE8;border-radius:10px;padding:11px;display:flex;gap:9px;flex-wrap:wrap">
+<input type="text" value="{{ query }}" onChange="{{ onQuery }}" placeholder="Posisi atau kata kunci" style="flex:1 1 170px;min-width:0;border:1px solid #DFDBE8;background:#fff;border-radius:6px;padding:10px 12px;font-size:13.5px;color:#1B1B1F"/>
+<input type="text" value="{{ lokasi }}" onChange="{{ onLokasi }}" placeholder="Lokasi" style="flex:1 1 110px;min-width:0;border:1px solid #DFDBE8;background:#fff;border-radius:6px;padding:10px 12px;font-size:13.5px;color:#1B1B1F"/>
+<button onClick="{{ noop }}" style="background:#606BDF;color:#fff;border:none;border-radius:6px;padding:11px 18px;font-size:13.5px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Cari</button>
+</div>
+<p style="font-size:12.5px;color:#9A9AA1;margin:10px 0 0">Tanpa login. {{ resultCount }} lowongan cocok dengan pencarianmu.</p>
+</div>
+<div style="min-width:0">
+<svg viewBox="0 0 600 480" style="width:100%;height:auto;display:block" role="img" aria-label="Ilustrasi kartu lowongan, grafik serapan alumni, dan tahapan seleksi">
+<defs><pattern id="kkdots2" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#8B93E8"></circle></pattern></defs>
+<rect x="70" y="26" width="470" height="360" fill="#EDEDFB"></rect>
+<rect x="18" y="322" width="170" height="130" fill="url(#kkdots2)"></rect>
+<rect x="470" y="30" width="14" height="14" fill="#606BDF"></rect>
+<rect x="494" y="54" width="14" height="14" fill="#8B93E8"></rect>
+<rect x="94" y="46" width="300" height="168" rx="10" fill="#fff" stroke="#DFDBE8" stroke-width="2" opacity="0.75"></rect>
+<rect x="60" y="72" width="316" height="172" rx="10" fill="#fff" stroke="#DFDBE8" stroke-width="2"></rect>
+<rect x="84" y="96" width="52" height="52" rx="8" fill="#606BDF"></rect>
+<circle cx="140" cy="98" r="8" fill="#FF4D4F"></circle>
+<rect x="150" y="102" width="140" height="13" rx="3" fill="#1B1B1F"></rect>
+<rect x="150" y="126" width="96" height="10" rx="3" fill="#9A9AA1"></rect>
+<rect x="286" y="98" width="66" height="22" rx="11" fill="#F6FFED" stroke="#B7EB8F" stroke-width="1.5"></rect>
+<circle cx="300" cy="109" r="3.5" fill="#237804"></circle>
+<rect x="308" y="105" width="34" height="8" rx="3" fill="#237804"></rect>
+<rect x="84" y="172" width="84" height="24" rx="6" fill="#EDEDFB"></rect>
+<rect x="176" y="172" width="66" height="24" rx="6" fill="#FFFBE6"></rect>
+<rect x="250" y="172" width="102" height="24" rx="6" fill="#F5F2FA" stroke="#DFDBE8" stroke-width="1.5"></rect>
+<rect x="300" y="246" width="250" height="150" rx="10" fill="#fff" stroke="#DFDBE8" stroke-width="2"></rect>
+<rect x="322" y="268" width="96" height="10" rx="3" fill="#1B1B1F"></rect>
+<rect x="322" y="286" width="58" height="8" rx="3" fill="#9A9AA1"></rect>
+<rect x="322" y="336" width="24" height="34" fill="#8B93E8"></rect>
+<rect x="356" y="320" width="24" height="50" fill="#606BDF"></rect>
+<rect x="390" y="330" width="24" height="40" fill="#8B93E8"></rect>
+<rect x="424" y="306" width="24" height="64" fill="#606BDF"></rect>
+<rect x="458" y="316" width="24" height="54" fill="#8B93E8"></rect>
+<rect x="492" y="296" width="24" height="74" fill="#606BDF"></rect>
+<line x1="322" y1="372" x2="528" y2="372" stroke="#DFDBE8" stroke-width="2"></line>
+<rect x="30" y="252" width="212" height="112" rx="10" fill="#fff" stroke="#DFDBE8" stroke-width="2"></rect>
+<path d="M62 364 L62 386 L88 364 Z" fill="#fff"></path>
+<path d="M62 364 L62 386 L88 364" fill="none" stroke="#DFDBE8" stroke-width="2"></path>
+<rect x="54" y="276" width="120" height="10" rx="3" fill="#9A9AA1"></rect>
+<rect x="54" y="294" width="80" height="10" rx="3" fill="#DFDBE8"></rect>
+<circle cx="62" cy="332" r="7" fill="#606BDF"></circle>
+<circle cx="86" cy="332" r="7" fill="#7A83E3"></circle>
+<circle cx="110" cy="332" r="7" fill="#C6CAF3"></circle>
+<line x1="76" y1="432" x2="446" y2="432" stroke="#DFDBE8" stroke-width="2"></line>
+<circle cx="76" cy="432" r="14" fill="#606BDF"></circle>
+<path d="M70 432 l4 5 l8 -10" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path>
+<circle cx="199" cy="432" r="14" fill="#606BDF"></circle>
+<path d="M193 432 l4 5 l8 -10" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"></path>
+<circle cx="322" cy="432" r="14" fill="#fff" stroke="#606BDF" stroke-width="2.5"></circle>
+<circle cx="322" cy="432" r="5" fill="#606BDF"></circle>
+<circle cx="446" cy="432" r="14" fill="#fff" stroke="#DFDBE8" stroke-width="2.5"></circle>
+</svg>
+</div>
+</div>
+</section>
+
+<section style="max-width:1180px;margin:0 auto;padding:clamp(24px,3vw,44px) clamp(14px,3vw,28px)">
+<h2 style="font-size:clamp(20px,2.2vw,27px);font-weight:600;letter-spacing:-0.6px;margin:0 0 6px">Lowongan aktif</h2>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0 0 16px">Lowongan kadaluarsa atau kuota penuh otomatis disembunyikan dari publik.</p>
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px">
+<sc-for list="{{ bidangChips }}" as="c" hint-placeholder-count="5">
+<button onClick="{{ c.pick }}" style="background:{{ c.bg }};color:{{ c.fg }};border:1px solid {{ c.bd }};padding:6px 13px;border-radius:20px;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="border-color:#606BDF;color:#4A54B3">{{ c.name }}</button>
+</sc-for>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px">
+<sc-for list="{{ jobs }}" as="job" hint-placeholder-count="6">
+<article onClick="{{ job.open }}" style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;cursor:pointer" style-hover="border-color:#606BDF;box-shadow:0 4px 14px rgba(96,107,223,0.12)">
+<div style="display:flex;align-items:flex-start;gap:11px">
+<div style="width:40px;height:40px;flex:0 0 auto;background:#EDEDFB;color:#4A54B3;border-radius:8px;display:grid;place-items:center;font-size:14px;font-weight:600">{{ job.initial }}</div>
+<div style="min-width:0;flex:1">
+<h3 style="font-size:15px;font-weight:600;margin:0 0 3px;line-height:1.3">{{ job.title }}</h3>
+<p style="font-size:12.5px;color:#6B6B6F;margin:0">{{ job.company }}</p>
+</div>
+</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<span style="font-size:11.5px;color:#6B6B6F;background:#F5F2FA;border:1px solid #DFDBE8;padding:3px 8px;border-radius:5px">{{ job.location }}</span>
+<span style="font-size:11.5px;color:#6B6B6F;background:#F5F2FA;border:1px solid #DFDBE8;padding:3px 8px;border-radius:5px">{{ job.type }}</span>
+<span style="font-size:11.5px;color:#4A54B3;background:#EDEDFB;padding:3px 8px;border-radius:5px">{{ job.slotLabel }}</span>
+</div>
+<div style="height:1px;background:#DFDBE8"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+<div><div style="font-size:11px;color:#9A9AA1">Batas lamaran</div><div style="font-size:12.5px;font-weight:500">{{ job.deadline }}</div></div>
+<span style="font-size:11.5px;font-weight:500;color:{{ job.badgeFg }};background:{{ job.badgeBg }};border:1px solid {{ job.badgeBd }};padding:3px 9px;border-radius:5px">{{ job.badge }}</span>
+</div>
+</article>
+</sc-for>
+</div>
+<sc-if value="{{ noJobs }}">
+<div style="background:#fff;border:1px dashed #DFDBE8;border-radius:10px;padding:40px 20px;text-align:center">
+<div style="font-size:14.5px;font-weight:500;margin-bottom:6px">Tidak ada lowongan yang cocok</div>
+<div style="font-size:13px;color:#9A9AA1">Coba ubah kata kunci, lokasi, atau pilih bidang lain.</div>
+</div>
+</sc-if>
+</section>
+</sc-if>
+
+<sc-if value="{{ scDetail }}">
+<section style="max-width:900px;margin:0 auto;padding:clamp(16px,2.5vw,32px) clamp(14px,3vw,28px) 40px">
+<div onClick="{{ goHome }}" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#606BDF;cursor:pointer;margin-bottom:16px">← Kembali ke daftar lowongan</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:clamp(18px,2.5vw,28px)">
+<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">
+<div style="width:52px;height:52px;flex:0 0 auto;background:#EDEDFB;color:#4A54B3;border-radius:8px;display:grid;place-items:center;font-size:17px;font-weight:600">{{ sel.initial }}</div>
+<div style="flex:1;min-width:180px">
+<h1 style="font-size:clamp(19px,2.4vw,26px);font-weight:600;letter-spacing:-0.5px;margin:0 0 5px">{{ sel.title }}</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0 0 10px">{{ sel.company }} · {{ sel.location }} · {{ sel.type }}</p>
+<div style="display:flex;gap:7px;flex-wrap:wrap">
+<span style="font-size:11.5px;font-weight:500;color:#237804;background:#F6FFED;border:1px solid #B7EB8F;padding:4px 9px;border-radius:5px">Perusahaan Verified</span>
+<span style="font-size:11.5px;font-weight:500;color:{{ sel.badgeFg }};background:{{ sel.badgeBg }};border:1px solid {{ sel.badgeBd }};padding:4px 9px;border-radius:5px">{{ sel.badge }}</span>
+<span style="font-size:11.5px;color:#6B6B6F;background:#F5F2FA;border:1px solid #DFDBE8;padding:4px 9px;border-radius:5px">Batas {{ sel.deadline }}</span>
+</div>
+</div>
+<button onClick="{{ startLamar }}" style="background:#606BDF;color:#fff;border:none;padding:12px 20px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;flex:0 0 auto" style-hover="background:#4A54B3">Lamar sekarang</button>
+</div>
+<div style="height:1px;background:#DFDBE8;margin:22px 0"></div>
+<h2 style="font-size:15px;font-weight:600;margin:0 0 8px">Deskripsi</h2>
+<p style="font-size:13.5px;line-height:1.7;color:#6B6B6F;margin:0 0 22px">{{ sel.desc }}</p>
+<h2 style="font-size:15px;font-weight:600;margin:0 0 10px">Posisi yang dibuka</h2>
+<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px">
+<sc-for list="{{ selPositions }}" as="p" hint-placeholder-count="2">
+<div style="border:1px solid #DFDBE8;border-radius:8px;padding:14px;background:#F5F2FA">
+<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px">
+<span style="font-size:13.5px;font-weight:500">{{ p.name }}</span>
+<span style="font-size:12.5px;color:#6B6B6F">{{ p.kuotaLabel }}</span>
+</div>
+<div style="height:8px;background:#fff;border:1px solid #DFDBE8;border-radius:5px;overflow:hidden"><div style="height:100%;background:#606BDF;width:{{ p.pct }}"></div></div>
+</div>
+</sc-for>
+</div>
+<h2 style="font-size:15px;font-weight:600;margin:0 0 12px">Tahapan seleksi</h2>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<sc-for list="{{ selStages }}" as="s" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:9px;border:1px solid #DFDBE8;background:#fff;border-radius:8px;padding:10px 13px">
+<span style="width:22px;height:22px;border-radius:50%;background:#EDEDFB;color:#4A54B3;font-size:11.5px;font-weight:600;display:grid;place-items:center">{{ s.n }}</span>
+<span style="font-size:13px">{{ s.name }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{ scAuth }}">
+<section style="max-width:460px;margin:0 auto;padding:clamp(20px,3vw,44px) clamp(14px,3vw,28px) 44px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:clamp(20px,3vw,30px)">
+<h1 style="font-size:22px;font-weight:600;letter-spacing:-0.5px;margin:0 0 6px">{{ authTitle }}</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0 0 20px">{{ authSub }}</p>
+<div style="display:flex;border:1px solid #DFDBE8;border-radius:6px;overflow:hidden;margin-bottom:20px">
+<div onClick="{{ setMasuk }}" style="flex:1;text-align:center;padding:9px;font-size:13px;font-weight:500;cursor:pointer;background:{{ tabMasukBg }};color:{{ tabMasukFg }}">Masuk</div>
+<div onClick="{{ setDaftar }}" style="flex:1;text-align:center;padding:9px;font-size:13px;font-weight:500;cursor:pointer;background:{{ tabDaftarBg }};color:{{ tabDaftarFg }}">Daftar</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<div>
+<label style="display:block;font-size:12.5px;font-weight:500;margin-bottom:6px">Email kampus</label>
+<input type="text" value="{{ email }}" onChange="{{ onEmail }}" placeholder="nama@kampus.ac.id" style="width:100%;border:1px solid {{ emailBorder }};border-radius:6px;padding:11px 12px;font-size:13.5px"/>
+<sc-if value="{{ emailError }}"><div style="font-size:12px;color:#CF1322;background:#FFF1F0;border-radius:4px;padding:6px 9px;margin-top:6px">Email wajib diisi.</div></sc-if>
+</div>
+<div>
+<label style="display:block;font-size:12.5px;font-weight:500;margin-bottom:6px">Password</label>
+<input type="password" value="{{ password }}" onChange="{{ onPassword }}" placeholder="••••••••" style="width:100%;border:1px solid #DFDBE8;border-radius:6px;padding:11px 12px;font-size:13.5px"/>
+</div>
+<sc-if value="{{ isDaftar }}">
+<div>
+<label style="display:block;font-size:12.5px;font-weight:500;margin-bottom:8px">Daftar sebagai</label>
+<div style="display:flex;gap:9px;flex-wrap:wrap">
+<div onClick="{{ pickPelamar }}" style="flex:1 1 120px;border:1px solid {{ regPelamarBd }};background:{{ regPelamarBg }};border-radius:8px;padding:12px;cursor:pointer">
+<div style="font-size:13px;font-weight:500;margin-bottom:3px">Pelamar</div>
+<div style="font-size:11.5px;color:#9A9AA1">Mahasiswa &amp; alumni</div>
+</div>
+<div onClick="{{ pickHrd }}" style="flex:1 1 120px;border:1px solid {{ regHrdBd }};background:{{ regHrdBg }};border-radius:8px;padding:12px;cursor:pointer">
+<div style="font-size:13px;font-weight:500;margin-bottom:3px">HRD</div>
+<div style="font-size:11.5px;color:#9A9AA1">Perlu verifikasi BKK</div>
+</div>
+</div>
+</div>
+<div style="background:#FFFBE6;border:1px solid #FFE58F;border-radius:6px;padding:11px 12px;font-size:12.5px;color:#D48806">Akun HRD berstatus <strong>Pending</strong> hingga dokumen perusahaan diverifikasi Admin BKK.</div>
+</sc-if>
+<button onClick="{{ submitAuth }}" style="background:#606BDF;color:#fff;border:none;padding:12px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;width:100%" style-hover="background:#4A54B3">{{ authCta }}</button>
+<div style="font-size:12px;color:#9A9AA1;text-align:center">Demo prototipe — password apa pun diterima.</div>
+</div>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{ scLamar }}">
+<section style="max-width:720px;margin:0 auto;padding:clamp(16px,2.5vw,32px) clamp(14px,3vw,28px) 44px">
+<div onClick="{{ backToDetail }}" style="display:inline-flex;gap:6px;font-size:13px;color:#606BDF;cursor:pointer;margin-bottom:16px">← Batal, kembali ke lowongan</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:clamp(18px,2.5vw,28px)">
+<h1 style="font-size:21px;font-weight:600;letter-spacing:-0.5px;margin:0 0 5px">Kirim lamaran</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0 0 22px">{{ sel.title }} · {{ sel.company }}</p>
+<h2 style="font-size:13.5px;font-weight:600;margin:0 0 10px">Pilih posisi</h2>
+<div style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px">
+<sc-for list="{{ selPositions }}" as="p" hint-placeholder-count="2">
+<div onClick="{{ p.pick }}" style="display:flex;align-items:center;gap:11px;border:1px solid {{ p.selBd }};background:{{ p.selBg }};border-radius:8px;padding:13px;cursor:pointer">
+<span style="width:18px;height:18px;flex:0 0 auto;border-radius:50%;border:2px solid {{ p.dotBd }};display:grid;place-items:center"><span style="width:8px;height:8px;border-radius:50%;background:{{ p.dotFill }}"></span></span>
+<span style="font-size:13.5px;font-weight:500;flex:1">{{ p.name }}</span>
+<span style="font-size:12px;color:#9A9AA1">{{ p.kuotaLabel }}</span>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ posError }}"><div style="font-size:12.5px;color:#CF1322;background:#FFF1F0;border:1px solid #FFA39E;border-radius:6px;padding:9px 11px;margin-bottom:14px">Pilih salah satu posisi terlebih dahulu.</div></sc-if>
+<div style="background:#EDEDFB;border-radius:8px;padding:13px;display:flex;gap:11px;align-items:flex-start;margin-bottom:20px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A54B3" stroke-width="2" stroke-linecap="round" style="flex:0 0 auto;margin-top:1px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
+<div>
+<div style="font-size:13px;font-weight:500;color:#4A54B3;margin-bottom:2px">CV_Rani-Anggraini.pdf akan disalin sebagai snapshot</div>
+<div style="font-size:12px;color:#6B6B6F">Perubahan profil setelah ini tidak mengubah lamaran yang sudah terkirim.</div>
+</div>
+</div>
+<h2 style="font-size:13.5px;font-weight:600;margin:0 0 8px">Surat lamaran</h2>
+<textarea value="{{ surat }}" onChange="{{ onSurat }}" placeholder="Tulis alasan singkat kenapa kamu cocok untuk posisi ini…" style="width:100%;min-height:130px;border:1px solid {{ suratBorder }};border-radius:8px;padding:12px;font-size:13.5px;font-family:Poppins,system-ui,sans-serif;line-height:1.6;resize:vertical;color:#1B1B1F"></textarea>
+<sc-if value="{{ suratError }}"><div style="font-size:12.5px;color:#CF1322;background:#FFF1F0;border:1px solid #FFA39E;border-radius:6px;padding:9px 11px;margin-top:8px">Surat lamaran wajib diisi.</div></sc-if>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
+<button onClick="{{ submitLamaran }}" style="background:#606BDF;color:#fff;border:none;padding:12px 22px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Kirim lamaran</button>
+<button onClick="{{ backToDetail }}" style="background:#fff;color:#1B1B1F;border:1px solid #DFDBE8;padding:12px 20px;border-radius:6px;font-size:14px;cursor:pointer" style-hover="background:#F5F2FA">Batal</button>
+</div>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{ scRiwayat }}">
+<section style="max-width:900px;margin:0 auto;padding:clamp(18px,2.5vw,36px) clamp(14px,3vw,28px) 44px">
+<h1 style="font-size:clamp(20px,2.2vw,26px);font-weight:600;letter-spacing:-0.6px;margin:0 0 6px">Riwayat lamaran</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0 0 20px">Hanya kamu yang bisa melihat status ini. Penolakan tidak ditampilkan ke pelamar lain.</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{ apps }}" as="a" hint-placeholder-count="2">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px">
+<div style="flex:1;min-width:170px">
+<div style="font-size:15px;font-weight:600;margin-bottom:3px">{{ a.position }}</div>
+<div style="font-size:12.5px;color:#6B6B6F">{{ a.company }} · dilamar {{ a.date }}</div>
+</div>
+<span style="font-size:11.5px;font-weight:500;color:{{ a.fg }};background:{{ a.bg }};border:1px solid {{ a.bd }};padding:4px 10px;border-radius:5px">{{ a.status }}</span>
+</div>
+<div style="display:flex;align-items:center;gap:0;flex-wrap:wrap">
+<sc-for list="{{ a.stages }}" as="s" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:7px;margin-right:10px;margin-bottom:6px">
+<span style="width:20px;height:20px;border-radius:50%;background:{{ s.bg }};border:1.5px solid {{ s.bd }};color:{{ s.fg }};font-size:10.5px;font-weight:600;display:grid;place-items:center">{{ s.n }}</span>
+<span style="font-size:12px;color:{{ s.textFg }}">{{ s.name }}</span>
+</div>
+</sc-for>
+</div>
+<div style="height:1px;background:#DFDBE8;margin:14px 0 12px"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<span style="font-size:12px;color:#9A9AA1">CV snapshot:</span>
+<span style="font-size:12px;color:#4A54B3;background:#EDEDFB;padding:4px 9px;border-radius:5px">{{ a.cv }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ noApps }}">
+<div style="background:#fff;border:1px dashed #DFDBE8;border-radius:10px;padding:44px 20px;text-align:center">
+<div style="font-size:14.5px;font-weight:500;margin-bottom:6px">Belum ada lamaran</div>
+<div style="font-size:13px;color:#9A9AA1;margin-bottom:16px">Jelajahi lowongan dan kirim lamaran pertamamu.</div>
+<button onClick="{{ goHome }}" style="background:#606BDF;color:#fff;border:none;padding:11px 20px;border-radius:6px;font-size:13.5px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Cari lowongan</button>
+</div>
+</sc-if>
+</section>
+</sc-if>
+
+<sc-if value="{{ scHrd }}">
+<section style="max-width:1180px;margin:0 auto;padding:clamp(18px,2.5vw,36px) clamp(14px,3vw,28px) 44px">
+<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
+<h1 style="font-size:clamp(20px,2.2vw,26px);font-weight:600;letter-spacing:-0.6px;margin:0">Dashboard HRD</h1>
+<span style="font-size:11.5px;font-weight:500;color:#237804;background:#F6FFED;border:1px solid #B7EB8F;padding:4px 9px;border-radius:5px">PT Nusantara Digital · Verified</span>
+</div>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0 0 20px">Pindahkan kandidat antar tahapan. Kuota terisi otomatis saat kandidat diterima.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:16px"><div style="font-size:23px;font-weight:600">{{ hrdTotal }}</div><div style="font-size:12px;color:#9A9AA1;margin-top:2px">Kandidat masuk</div></div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:16px"><div style="font-size:23px;font-weight:600">{{ hrdProses }}</div><div style="font-size:12px;color:#9A9AA1;margin-top:2px">Dalam proses seleksi</div></div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:16px"><div style="font-size:23px;font-weight:600;color:#237804">{{ hrdDiterima }}</div><div style="font-size:12px;color:#9A9AA1;margin-top:2px">Diterima</div></div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:16px"><div style="font-size:23px;font-weight:600">{{ hrdKuota }}</div><div style="font-size:12px;color:#9A9AA1;margin-top:2px">Kuota tersisa</div></div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="padding:15px 18px;border-bottom:1px solid #DFDBE8;background:#F5F2FA;font-size:13.5px;font-weight:600">Kandidat · Frontend Developer</div>
+<sc-for list="{{ candidates }}" as="c" hint-placeholder-count="4">
+<div style="padding:16px 18px;border-bottom:1px solid #DFDBE8;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+<div style="width:38px;height:38px;flex:0 0 auto;border-radius:50%;background:#EDEDFB;color:#4A54B3;display:grid;place-items:center;font-size:12.5px;font-weight:600">{{ c.initial }}</div>
+<div style="flex:1 1 150px;min-width:0">
+<div style="font-size:14px;font-weight:500">{{ c.name }}</div>
+<div style="font-size:12px;color:#9A9AA1">{{ c.meta }}</div>
+</div>
+<span style="font-size:11.5px;font-weight:500;color:{{ c.fg }};background:{{ c.bg }};border:1px solid {{ c.bd }};padding:4px 10px;border-radius:5px;flex:0 0 auto">{{ c.stageLabel }}</span>
+<div style="display:flex;gap:7px;flex-wrap:wrap">
+<sc-if value="{{ c.canAct }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ c.advance }}" style="background:#fff;color:#4A54B3;border:1px solid #606BDF;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer" style-hover="background:#EDEDFB">Lanjut tahap</button>
+<button onClick="{{ c.accept }}" style="background:#F6FFED;color:#237804;border:1px solid #B7EB8F;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer" style-hover="background:#D9F7BE">Terima</button>
+<button onClick="{{ c.reject }}" style="background:#FF4D4F;color:#fff;border:none;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer" style-hover="background:#CF1322">Tolak</button>
+</sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{ scAdmin }}">
+<section style="max-width:1180px;margin:0 auto;padding:clamp(18px,2.5vw,36px) clamp(14px,3vw,28px) 44px">
+<h1 style="font-size:clamp(20px,2.2vw,26px);font-weight:600;letter-spacing:-0.6px;margin:0 0 6px">Dashboard Admin BKK</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0 0 20px">Verifikasi perusahaan dan pantau data tracer study yang terisi otomatis.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="padding:15px 18px;border-bottom:1px solid #DFDBE8;background:#F5F2FA;display:flex;justify-content:space-between;gap:10px;align-items:center">
+<span style="font-size:13.5px;font-weight:600">Antrean verifikasi</span>
+<span style="font-size:11.5px;font-weight:500;color:#D48806;background:#FFFBE6;border:1px solid #FFE58F;padding:3px 9px;border-radius:5px">{{ pendingCount }} pending</span>
+</div>
+<sc-for list="{{ companies }}" as="co" hint-placeholder-count="3">
+<div style="padding:15px 18px;border-bottom:1px solid #DFDBE8">
+<div style="display:flex;gap:10px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px">
+<div><div style="font-size:14px;font-weight:500">{{ co.name }}</div><div style="font-size:12px;color:#9A9AA1">{{ co.doc }}</div></div>
+<span style="font-size:11.5px;font-weight:500;color:{{ co.fg }};background:{{ co.bg }};border:1px solid {{ co.bd }};padding:4px 10px;border-radius:5px">{{ co.status }}</span>
+</div>
+<sc-if value="{{ co.pending }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;gap:7px;flex-wrap:wrap">
+<button onClick="{{ co.verify }}" style="background:#606BDF;color:#fff;border:none;padding:7px 13px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Verified</button>
+<button onClick="{{ co.reject }}" style="background:#fff;color:#6B6B6F;border:1px solid #DFDBE8;padding:7px 13px;border-radius:6px;font-size:12px;cursor:pointer" style-hover="background:#F5F2FA">Tolak</button>
+<button onClick="{{ co.blacklist }}" style="background:#FFF1F0;color:#CF1322;border:1px solid #FFA39E;padding:7px 13px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer" style-hover="background:#FFCCC7">Blacklist</button>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px">
+<div><div style="font-size:13.5px;font-weight:600">Serapan alumni per bidang</div><div style="font-size:12px;color:#9A9AA1;margin-top:2px">Angkatan 2024 – 2026</div></div>
+<span style="font-size:11.5px;font-weight:500;color:#237804;background:#F6FFED;border:1px solid #B7EB8F;padding:3px 9px;border-radius:5px">Otomatis</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{ bidang }}" as="b" hint-placeholder-count="5">
+<div>
+<div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span>{{ b.name }}</span><span style="color:#9A9AA1">{{ b.label }}</span></div>
+<div style="height:9px;background:#F5F2FA;border:1px solid #DFDBE8;border-radius:5px;overflow:hidden"><div style="height:100%;background:#606BDF;width:{{ b.pct }}"></div></div>
+</div>
+</sc-for>
+</div>
+<div style="height:1px;background:#DFDBE8;margin:18px 0"></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:12px;margin-bottom:16px">
+<div><div style="font-size:18px;font-weight:600">3,1 bln</div><div style="font-size:11.5px;color:#9A9AA1">Waktu tunggu</div></div>
+<div><div style="font-size:18px;font-weight:600">Rp5,4 jt</div><div style="font-size:11.5px;color:#9A9AA1">Median gaji awal</div></div>
+</div>
+<button onClick="{{ downloadReport }}" style="background:#606BDF;color:#fff;border:none;padding:11px 18px;border-radius:6px;font-size:13.5px;font-weight:500;cursor:pointer;width:100%" style-hover="background:#4A54B3">Unduh laporan akreditasi (2 tahun)</button>
+</div>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{ scProfil }}">
+<section style="max-width:720px;margin:0 auto;padding:clamp(18px,2.5vw,36px) clamp(14px,3vw,28px) 44px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:clamp(18px,2.5vw,28px)">
+<div style="display:flex;gap:14px;align-items:center;margin-bottom:22px">
+<div style="width:54px;height:54px;border-radius:50%;background:#EDEDFB;color:#4A54B3;display:grid;place-items:center;font-size:18px;font-weight:600">RA</div>
+<div>
+<div style="font-size:18px;font-weight:600">Rani Anggraini</div>
+<div style="font-size:13px;color:#6B6B6F">Teknik Informatika · Lulus 2026 · Peran: {{ roleName }}</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px">
+<div style="border:1px solid #DFDBE8;border-radius:8px;padding:14px;background:#F5F2FA"><div style="font-size:11.5px;color:#9A9AA1;margin-bottom:4px">Email</div><div style="font-size:13.5px">rani@kampus.ac.id</div></div>
+<div style="border:1px solid #DFDBE8;border-radius:8px;padding:14px;background:#F5F2FA"><div style="font-size:11.5px;color:#9A9AA1;margin-bottom:4px">Tanggal lulus</div><div style="font-size:13.5px">12 Juli 2026</div></div>
+</div>
+<div style="border:1px solid #DFDBE8;border-radius:8px;padding:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A54B3" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
+<div style="flex:1;min-width:140px"><div style="font-size:13.5px;font-weight:500">CV_Rani-Anggraini.pdf</div><div style="font-size:12px;color:#9A9AA1">Diunggah 28 Juli 2026 · 412 KB</div></div>
+<span style="font-size:11.5px;font-weight:500;color:#237804;background:#F6FFED;border:1px solid #B7EB8F;padding:4px 10px;border-radius:5px">CV utama</span>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button onClick="{{ switchRole }}" style="background:#EDEDFB;color:#4A54B3;border:1px solid #606BDF;padding:11px 18px;border-radius:6px;font-size:13.5px;font-weight:500;cursor:pointer" style-hover="background:#606BDF;color:#fff">Ganti peran ke {{ nextRoleName }}</button>
+<button onClick="{{ logout }}" style="background:#fff;color:#CF1322;border:1px solid #FFA39E;padding:11px 18px;border-radius:6px;font-size:13.5px;font-weight:500;cursor:pointer" style-hover="background:#FFF1F0">Keluar</button>
+</div>
+</div>
+</section>
+</sc-if>
+
+</main>
+
+<sc-if value="{{ isMobile }}">
+<div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #DFDBE8;display:grid;grid-template-columns:repeat(4,1fr);z-index:12">
+<div onClick="{{ goHome }}" style="padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ navHomeColor }}">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+<span style="font-size:10.5px">Beranda</span>
+</div>
+<div onClick="{{ goRiwayat }}" style="padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ navRiwayatColor }}">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 2h6v4H9z"></path><rect x="4" y="6" width="16" height="16" rx="2"></rect></svg>
+<span style="font-size:10.5px">Lamaran</span>
+</div>
+<div onClick="{{ goDash }}" style="padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ navDashColor }}">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"></path><path d="m7 15 4-6 4 3 4-7"></path></svg>
+<span style="font-size:10.5px">Dashboard</span>
+</div>
+<div onClick="{{ goProfil }}" style="padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ navProfilColor }}">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+<span style="font-size:10.5px">Profil</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ chatOpen }}">
+<div style="position:absolute;right:14px;bottom:{{ panelBottom }};width:min(320px,calc(100% - 28px));background:#fff;border:1px solid #DFDBE8;border-radius:12px;box-shadow:0 10px 34px rgba(0,0,0,0.16);z-index:20;overflow:hidden;display:flex;flex-direction:column;max-height:420px">
+<div style="padding:13px 15px;border-bottom:1px solid #DFDBE8;background:#606BDF;display:flex;align-items:center;gap:9px">
+<span style="width:26px;height:26px;border-radius:50%;background:#fff;color:#606BDF;font-size:12px;font-weight:700;display:grid;place-items:center">AI</span>
+<div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:#fff">Asisten Karir</div><div style="font-size:11px;color:#EDEDFB">Online</div></div>
+<span onClick="{{ toggleChat }}" style="color:#fff;font-size:18px;cursor:pointer;line-height:1">×</span>
+</div>
+<div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#F5F2FA">
+<sc-for list="{{ chatMsgs }}" as="m" hint-placeholder-count="2">
+<div style="align-self:{{ m.align }};max-width:82%;background:{{ m.bg }};color:{{ m.fg }};border:1px solid {{ m.bd }};border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.55">{{ m.text }}</div>
+</sc-for>
+</div>
+<div style="padding:11px;border-top:1px solid #DFDBE8;display:flex;gap:7px;flex-wrap:wrap">
+<sc-for list="{{ chatSuggestions }}" as="s" hint-placeholder-count="3">
+<button onClick="{{ s.ask }}" style="background:#fff;color:#4A54B3;border:1px solid #606BDF;padding:6px 11px;border-radius:16px;font-size:11.5px;cursor:pointer" style-hover="background:#EDEDFB">{{ s.text }}</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<div onClick="{{ toggleChat }}" style="position:absolute;right:14px;bottom:{{ fabBottom }};width:50px;height:50px;border-radius:50%;background:#606BDF;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 20px rgba(96,107,223,0.42);z-index:19">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+</div>
+
+<sc-if value="{{ toast }}">
+<div style="position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:#1B1B1F;color:#fff;padding:11px 18px;border-radius:8px;font-size:12.5px;font-weight:500;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,0.24);white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis">{{ toast }}</div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>

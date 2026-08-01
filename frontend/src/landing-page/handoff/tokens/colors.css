@@ -1,0 +1,50 @@
+/* KerjaKink — design tokens
+   Font: Poppins (400, 500, 600, 700)
+   https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap */
+:root {
+  /* Primary */
+  --kk-primary: #1890FF;
+  --kk-primary-hover: #096DD9;
+  --kk-primary-bg: #E6F7FF;
+  --kk-primary-border: #91D5FF;
+
+  /* Success — badge aktif / valid */
+  --kk-success-bg: #F6FFED;
+  --kk-success-text: #237804;
+  --kk-success-border: #B7EB8F;
+
+  /* Warning — badge pending / alert */
+  --kk-warning-bg: #FFFBE6;
+  --kk-warning-text: #D48806;
+  --kk-warning-border: #FFE58F;
+
+  /* Error / danger */
+  --kk-error-bg: #FFF1F0;
+  --kk-error-text: #CF1322;
+  --kk-error-border: #FFA39E;
+  --kk-danger: #FF4D4F;
+  --kk-danger-hover: #CF1322;
+
+  /* Typography */
+  --kk-text: #262626;
+  --kk-text-secondary: #595959;
+  --kk-text-placeholder: #8C8C8C;
+
+  /* Surface & border */
+  --kk-bg-page: #FAFAFA;
+  --kk-bg-card: #FFFFFF;
+  --kk-border: #D9D9D9;
+  --kk-border-focus: #1890FF;
+  --kk-table-header-bg: #FAFAFA;
+
+  /* Font */
+  --kk-font: 'Poppins', system-ui, sans-serif;
+  --kk-radius: 6px;
+  --kk-radius-lg: 10px;
+}
+
+/* Interaction states */
+a { color: var(--kk-primary); text-decoration: none; }
+a:hover { color: var(--kk-primary-hover); }
+:focus-visible { outline: 2px solid var(--kk-primary); outline-offset: 2px; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--kk-border-focus); }

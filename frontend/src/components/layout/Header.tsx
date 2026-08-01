@@ -24,11 +24,14 @@ import {
   Logout as LogoutIcon,
   Person as PersonIcon,
   NavigateNext as NavigateNextIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  KeyboardArrowUp as KeyboardArrowUpIcon,
 } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useThemeMode, useAuth } from '@/hooks';
 import { DialogUserProfile } from '@/components/dialog/dialog-auth/DialogUserProfile';
+import { DialogNotification } from '@/components/dialog/dialog-shared/DialogNotification';
 import { DRAWER_WIDTH } from './Sidebar';
 
 interface HeaderProps {
@@ -43,10 +46,13 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null);
+  const [notificationCount, setNotificationCount] = useState(0);
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
   const displayName = user?.displayName || user?.name || user?.email || 'User';
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationAnchorEl(null);
     setAnchorEl(event.currentTarget);
   };
 
@@ -63,6 +69,17 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
   const handleProfileClick = () => {
     handleUserMenuClose();
     setIsProfileDialogOpen(true);
+  };
+
+  const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(null);
+    setNotificationAnchorEl((currentAnchorEl) =>
+      currentAnchorEl ? null : event.currentTarget
+    );
+  };
+
+  const handleNotificationClose = () => {
+    setNotificationAnchorEl(null);
   };
 
   // Generate breadcrumbs from current path
@@ -274,6 +291,11 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
 
           {/* Notifications */}
           <IconButton
+            onClick={handleNotificationClick}
+            aria-controls={notificationAnchorEl ? 'notification-popover' : undefined}
+            aria-haspopup="dialog"
+            aria-expanded={notificationAnchorEl ? 'true' : undefined}
+            aria-label="Buka notifikasi"
             sx={{
               color: 'text.secondary',
               border: '1px solid',
@@ -282,7 +304,7 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
               mr: 1,
             }}
           >
-            <Badge badgeContent={4} color="error">
+            <Badge badgeContent={notificationCount} color="error" max={99}>
               <NotificationsIcon fontSize="small" />
             </Badge>
           </IconButton>
@@ -290,8 +312,17 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
           {/* User Avatar */}
           <IconButton
             onClick={handleUserMenuOpen}
+            aria-controls={anchorEl ? 'user-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={anchorEl ? 'true' : undefined}
             sx={{
               p: 0.5,
+              pl: 0.5,
+              pr: 0.75,
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2,
+              gap: 0.5,
             }}
           >
             <Avatar
@@ -306,10 +337,16 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
             >
               {displayName.charAt(0).toUpperCase()}
             </Avatar>
+            {anchorEl ? (
+              <KeyboardArrowUpIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+            ) : (
+              <KeyboardArrowDownIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+            )}
           </IconButton>
 
           {/* User Menu */}
           <Menu
+            id="user-menu"
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleUserMenuClose}
@@ -350,6 +387,11 @@ export function Header({ onMenuClick, isDesktop }: HeaderProps) {
           </Menu>
         </Toolbar>
       </AppBar>
+      <DialogNotification
+        anchorEl={notificationAnchorEl}
+        onClose={handleNotificationClose}
+        onNotificationCountChange={setNotificationCount}
+      />
       <DialogUserProfile
         open={isProfileDialogOpen}
         onClose={() => setIsProfileDialogOpen(false)}

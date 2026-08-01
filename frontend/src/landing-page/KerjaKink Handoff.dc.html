@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="tokens/colors.css"><style>body{margin:0;background:#F5F2FA;font-family:Poppins,system-ui,sans-serif;color:#1B1B1F;-webkit-font-smoothing:antialiased}*{box-sizing:border-box}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}</style></helmet>
+
+<div style="max-width:1120px;margin:0 auto;padding:clamp(20px,3vw,48px) clamp(16px,3vw,32px) 64px">
+
+<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;border-bottom:2px solid #1B1B1F;padding-bottom:20px;margin-bottom:32px">
+<div>
+<div style="font-size:11.5px;font-weight:600;letter-spacing:1.4px;color:#9A9AA1;margin-bottom:10px">HANDOFF UNTUK FRONTEND</div>
+<h1 style="font-size:clamp(26px,3.2vw,40px);font-weight:700;letter-spacing:-1px;margin:0 0 8px">Aset grafis &amp; palet warna KerjaKink</h1>
+<p style="font-size:14px;color:#6B6B6F;margin:0;max-width:60ch">Semua grafis dalam format SVG (skalabel, tanpa raster), token warna tersedia sebagai CSS variables, JSON, dan konfigurasi Tailwind.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9A9AA1">
+<span>Typeface · <strong style="color:#1B1B1F;font-weight:600">Poppins</strong> 400 / 500 / 600 / 700</span>
+<span>Radius · 6px kontrol, 10px kartu</span>
+<span>26 file · 1 Agustus 2026</span>
+</div>
+</div>
+
+<h2 style="font-size:19px;font-weight:600;letter-spacing:-0.4px;margin:0 0 4px">1 · Logo</h2>
+<p style="font-size:13px;color:#6B6B6F;margin:0 0 16px"><code>assets/logo/</code> — monogram huruf K dari tiga garis, tanpa sudut membulat.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:40px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="height:104px;background:#FFFFFF;border-bottom:1px solid #DFDBE8;background-image:url('assets/logo/logo-lockup.svg');background-repeat:no-repeat;background-position:center;background-size:auto 30px"></div>
+<div style="padding:12px 14px">
+<div style="font-size:12.5px;font-weight:500;margin-bottom:3px">logo-lockup.svg</div>
+<div style="font-size:11.5px;color:#9A9AA1">Header latar terang</div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="height:104px;background:#606BDF;border-bottom:1px solid #DFDBE8;background-image:url('assets/logo/logo-lockup-light.svg');background-repeat:no-repeat;background-position:center;background-size:auto 30px"></div>
+<div style="padding:12px 14px">
+<div style="font-size:12.5px;font-weight:500;margin-bottom:3px">logo-lockup-light.svg</div>
+<div style="font-size:11.5px;color:#9A9AA1">Header latar biru / gelap</div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="height:104px;background:#FFFFFF;border-bottom:1px solid #DFDBE8;background-image:url('assets/logo/logo-mark.svg');background-repeat:no-repeat;background-position:center;background-size:auto 38px"></div>
+<div style="padding:12px 14px">
+<div style="font-size:12.5px;font-weight:500;margin-bottom:3px">logo-mark.svg</div>
+<div style="font-size:11.5px;color:#9A9AA1">Monogram, latar terang</div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="height:104px;background:#1B1B1F;border-bottom:1px solid #DFDBE8;background-image:url('assets/logo/logo-mark-light.svg');background-repeat:no-repeat;background-position:center;background-size:auto 38px"></div>
+<div style="padding:12px 14px">
+<div style="font-size:12.5px;font-weight:500;margin-bottom:3px">logo-mark-light.svg</div>
+<div style="font-size:11.5px;color:#9A9AA1">Monogram, latar gelap</div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="height:104px;background:#F5F2FA;border-bottom:1px solid #DFDBE8;background-image:url('assets/logo/logo-mark-mono.svg');background-repeat:no-repeat;background-position:center;background-size:auto 38px"></div>
+<div style="padding:12px 14px">
+<div style="font-size:12.5px;font-weight:500;margin-bottom:3px">logo-mark-mono.svg</div>
+<div style="font-size:11.5px;color:#9A9AA1">Satu warna, currentColor</div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="height:104px;background:#F5F2FA;border-bottom:1px solid #DFDBE8;background-image:url('assets/logo/favicon.svg');background-repeat:no-repeat;background-position:center;background-size:auto 40px"></div>
+<div style="padding:12px 14px">
+<div style="font-size:12.5px;font-weight:500;margin-bottom:3px">favicon.svg</div>
+<div style="font-size:11.5px;color:#9A9AA1">Favicon 32 × 32</div>
+</div>
+</div>
+</div>
+
+<h2 style="font-size:19px;font-weight:600;letter-spacing:-0.4px;margin:0 0 4px">2 · Ilustrasi hero</h2>
+<p style="font-size:13px;color:#6B6B6F;margin:0 0 16px"><code>assets/illustration/hero-bursa-kerja.svg</code> — 600 × 480, tanpa animasi, warna mengikuti palet.</p>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:clamp(16px,3vw,32px);margin-bottom:40px">
+<img src="assets/illustration/hero-bursa-kerja.svg" alt="Ilustrasi hero KerjaKink" style="width:100%;max-width:620px;height:auto;display:block"/>
+</div>
+
+<h2 style="font-size:19px;font-weight:600;letter-spacing:-0.4px;margin:0 0 4px">3 · Ikon UI</h2>
+<p style="font-size:13px;color:#6B6B6F;margin:0 0 16px"><code>assets/icons/</code> — 24 × 24, <code>stroke="currentColor"</code>, stroke-width 2. Warnai lewat properti <code>color</code>.</p>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:16px;margin-bottom:40px;color:#1B1B1F">
+<sc-for list="{{ icons }}" as="i" hint-placeholder-count="14">
+<div style="display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center">
+<div style="width:46px;height:46px;border:1px solid #DFDBE8;border-radius:8px;background:#F5F2FA;background-image:{{ i.url }};background-repeat:no-repeat;background-position:center;background-size:22px 22px"></div>
+<code style="font-size:10.5px;color:#9A9AA1;white-space:nowrap">{{ i.name }}</code>
+</div>
+</sc-for>
+</div>
+
+<h2 style="font-size:19px;font-weight:600;letter-spacing:-0.4px;margin:0 0 4px">4 · Palet warna</h2>
+<p style="font-size:13px;color:#6B6B6F;margin:0 0 16px">Klik nilai hex untuk menyalin. Lembar swatch: <code>assets/palette/palette-kerjakink.svg</code></p>
+<div style="display:flex;flex-direction:column;gap:16px;margin-bottom:40px">
+<sc-for list="{{ groups }}" as="g" hint-placeholder-count="6">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="padding:13px 18px;border-bottom:1px solid #DFDBE8;background:#F5F2FA;display:flex;gap:12px;flex-wrap:wrap;align-items:baseline">
+<span style="font-size:13.5px;font-weight:600">{{ g.title }}</span>
+<span style="font-size:11.5px;color:#9A9AA1">{{ g.note }}</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))">
+<sc-for list="{{ g.items }}" as="c" hint-placeholder-count="3">
+<div onClick="{{ c.copy }}" style="padding:16px 18px;border-right:1px solid #DFDBE8;border-bottom:1px solid #DFDBE8;cursor:pointer" style-hover="background:#F5F2FA">
+<div style="height:52px;border:1px solid #DFDBE8;background:{{ c.hex }};margin-bottom:12px"></div>
+<div style="font-size:12.5px;font-weight:500;margin-bottom:3px">{{ c.name }}</div>
+<code style="font-size:11.5px;color:#6B6B6F;display:block;margin-bottom:5px">{{ c.hex }}</code>
+<code style="font-size:11px;color:#9A9AA1">{{ c.token }}</code>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+
+<h2 style="font-size:19px;font-weight:600;letter-spacing:-0.4px;margin:0 0 4px">5 · Token &amp; cara pakai</h2>
+<p style="font-size:13px;color:#6B6B6F;margin:0 0 16px">Tiga format disediakan agar developer bisa pilih sesuai stack.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:24px">
+<sc-for list="{{ tokenFiles }}" as="t" hint-placeholder-count="3">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<code style="font-size:12px;font-weight:600;color:#4A54B3;display:block;margin-bottom:8px">{{ t.path }}</code>
+<div style="font-size:12.5px;color:#6B6B6F;line-height:1.6">{{ t.desc }}</div>
+</div>
+</sc-for>
+</div>
+<div style="background:#1B1B1F;border-radius:10px;padding:20px;overflow-x:auto;margin-bottom:40px">
+<pre style="margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.75;color:#EDEDFB">{{ snippet }}</pre>
+</div>
+
+<h2 style="font-size:19px;font-weight:600;letter-spacing:-0.4px;margin:0 0 4px">6 · Aturan penting</h2>
+<div style="background:#EDEDFB;border-radius:10px;padding:20px 22px;margin-bottom:32px">
+<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;font-size:13px;color:#1B1B1F;line-height:1.6">
+<sc-for list="{{ rules }}" as="r" hint-placeholder-count="5">
+<li style="display:flex;gap:11px"><span style="color:#606BDF;font-weight:700">→</span><span>{{ r }}</span></li>
+</sc-for>
+</ul>
+</div>
+
+<div style="border-top:1px solid #DFDBE8;padding-top:20px;font-size:12px;color:#9A9AA1">Struktur folder lengkap dan catatan implementasi ada di <code>assets/README.md</code>.</div>
+
+<sc-if value="{{ toast }}">
+<div style="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#1B1B1F;color:#fff;padding:11px 18px;border-radius:8px;font-size:12.5px;font-weight:500;z-index:40">{{ toast }}</div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:900}}">
+const GROUPS = [
+  { title: "Primary", note: "Button, link, focus", items: [
+    { name: "Primary", hex: "#606BDF", token: "--kk-primary" },
+    { name: "Primary Hover", hex: "#4A54B3", token: "--kk-primary-hover" },
+    { name: "Primary Light BG", hex: "#EDEDFB", token: "--kk-primary-bg" }
+  ]},
+  { title: "Success", note: "Badge aktif / valid", items: [
+    { name: "Success BG", hex: "#F6FFED", token: "--kk-success-bg" },
+    { name: "Success Text", hex: "#237804", token: "--kk-success-text" },
+    { name: "Success Border", hex: "#B7EB8F", token: "--kk-success-border" }
+  ]},
+  { title: "Warning", note: "Badge pending / alert", items: [
+    { name: "Warning BG", hex: "#FFFBE6", token: "--kk-warning-bg" },
+    { name: "Warning Text", hex: "#D48806", token: "--kk-warning-text" },
+    { name: "Warning Border", hex: "#FFE58F", token: "--kk-warning-border" }
+  ]},
+  { title: "Error / Danger", note: "Hapus, validation error", items: [
+    { name: "Error BG", hex: "#FFF1F0", token: "--kk-error-bg" },
+    { name: "Error Text", hex: "#CF1322", token: "--kk-error-text" },
+    { name: "Danger Button", hex: "#FF4D4F", token: "--kk-danger" }
+  ]},
+  { title: "Typography", note: "Hirarki teks", items: [
+    { name: "Text Primary", hex: "#1B1B1F", token: "--kk-text" },
+    { name: "Text Secondary", hex: "#6B6B6F", token: "--kk-text-secondary" },
+    { name: "Placeholder", hex: "#9A9AA1", token: "--kk-text-placeholder" }
+  ]},
+  { title: "Surface & Border", note: "Latar dan garis", items: [
+    { name: "Page BG", hex: "#F5F2FA", token: "--kk-bg-page" },
+    { name: "Card & Table BG", hex: "#FFFFFF", token: "--kk-bg-card" },
+    { name: "Border Default", hex: "#DFDBE8", token: "--kk-border" }
+  ]}
+];
+
+const SNIPPET = [
+  '<!-- 1. Font -->',
+  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">',
+  '',
+  '<!-- 2. Token -->',
+  '<link rel="stylesheet" href="tokens/colors.css">',
+  '',
+  '/* 3. Pakai token, jangan hard-code hex */',
+  '.btn-primary  { background: var(--kk-primary); color: #fff; border-radius: var(--kk-radius); }',
+  '.btn-primary:hover { background: var(--kk-primary-hover); }',
+  '.badge-aktif  { background: var(--kk-success-bg); color: var(--kk-success-text);',
+  '                border: 1px solid var(--kk-success-border); }',
+  '.card         { background: var(--kk-bg-card); border: 1px solid var(--kk-border);',
+  '                border-radius: var(--kk-radius-lg); }',
+  '.input:focus  { border-color: var(--kk-border-focus); outline: none; }'
+].join("\n");
+
+class Component extends DCLogic {
+  state = { toast: "" };
+
+  copy(hex) {
+    if (navigator.clipboard) navigator.clipboard.writeText(hex).catch(() => {});
+    this.setState({ toast: hex + " disalin ke clipboard" });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: "" }), 2000);
+  }
+
+  renderVals() {
+    return {
+      icons: ["bell","briefcase","user","shield-check","file-text","home","clipboard","chart-line","search","message-square","settings","switch-role","check","download"]
+        .map(n => ({ name: n, url: "url('assets/icons/" + n + ".svg')" })),
+      groups: GROUPS.map(g => Object.assign({}, g, {
+        items: g.items.map(c => Object.assign({}, c, { copy: () => this.copy(c.hex) }))
+      })),
+      tokenFiles: [
+        { path: "tokens/colors.css", desc: "CSS custom properties --kk-* plus state hover, focus-visible, dan link. Paling cepat dipakai." },
+        { path: "tokens/colors.json", desc: "Token terstruktur untuk build tool atau Style Dictionary." },
+        { path: "tokens/tailwind.config.js", desc: "Ekstensi warna, font, dan radius untuk proyek Tailwind." }
+      ],
+      snippet: SNIPPET,
+      rules: [
+        "Semua ikon memakai stroke currentColor — jangan hard-code warna stroke di file SVG.",
+        "Focus ring wajib ada: outline 2px solid #606BDF dengan offset 2px. Jangan pakai ring biru default browser.",
+        "Radius hanya 6px (kontrol, badge), 10px (kartu), 20px (chip / pill), dan 50% (avatar).",
+        "Teks di atas latar tinted memakai pasangannya: teks #237804 di #F6FFED, #D48806 di #FFFBE6, #CF1322 di #FFF1F0.",
+        "Tombol destruktif memakai #FF4D4F dengan hover #CF1322 — bukan Error Text sebagai latar.",
+        "Ilustrasi dan logo tetap SVG inline atau <img>; jangan konversi ke PNG kecuali untuk email."
+      ],
+      toast: this.state.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>

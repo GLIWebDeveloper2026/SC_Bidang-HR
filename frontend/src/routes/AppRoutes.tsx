@@ -3,6 +3,7 @@ import { AppLayout } from '@/components/layout';
 import { ProtectedRoute } from './ProtectedRoute';
 import {
   LoginPage,
+  RegisterPage,
   DashboardPage,
   NotFoundPage,
   LowonganPage,
@@ -19,6 +20,7 @@ export function AppRoutes() {
     <Routes>
       {/* Public routes */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
       {/* Protected routes */}
       <Route element={<ProtectedRoute />}>

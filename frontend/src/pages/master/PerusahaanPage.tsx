@@ -2,11 +2,9 @@ import { useEffect, useState } from 'react';
 import {
   Alert,
   Box,
-  Breadcrumbs,
   Chip,
   CircularProgress,
   IconButton,
-  Link,
   Paper,
   Table,
   TableBody,
@@ -18,7 +16,6 @@ import {
 } from '@mui/material';
 import {
   Edit as EditIcon,
-  Home as HomeIcon,
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -269,20 +266,6 @@ export function PerusahaanPage() {
 
   return (
     <Box>
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }} separator=">">
-        <Link
-          underline="hover"
-          sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}
-          href="#"
-        >
-          <HomeIcon sx={{ mr: 0.5, fontSize: 18 }} />
-          Home
-        </Link>
-        <Typography color="text.primary" sx={{ fontWeight: 500 }}>
-          Perusahaan
-        </Typography>
-      </Breadcrumbs>
-
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 600 }}>
           Perusahaan
