@@ -1,15 +1,52 @@
 const authService = require('../services/auth.service');
 
 class AuthController {
-  async register(req, res) {
+  
+  // Endpoint untuk mengarahkan ke halaman Google Login
+  googleAuth(req, res) {
     try {
-      const { email, password, nama, level_id } = req.body;
+      const url = authService.getGoogleAuthUrl();
+      // Redirect langsung ke halaman login Google
+      return res.redirect(url);
+    } catch (error) {
+      console.error('Google Auth Error:', error);
+      return res.status(500).json({ success: false, message: 'Gagal mendapatkan URL Login Google' });
+    }
+  }
 
-      if (!email || !password || !nama || !level_id) {
-        return res.status(400).json({ success: false, message: 'Semua field (email, password, nama, level_id) wajib diisi' });
+  // Endpoint untuk menerima callback dari Google
+  async googleCallback(req, res) {
+    try {
+      const { code } = req.query;
+      
+      if (!code) {
+        return res.status(400).json({ success: false, message: 'Authorization code tidak ditemukan' });
       }
 
-      const result = await authService.register({ email, password, nama, level_id });
+      const result = await authService.handleGoogleCallback(code);
+
+      // Berhasil Login / Register, kembalikan token dan data user
+      return res.status(200).json({
+        success: true,
+        message: 'Google Login berhasil',
+        data: result
+      });
+    } catch (error) {
+      console.error('Google Callback Error:', error);
+      return res.status(500).json({ success: false, message: error.message || 'Gagal memproses Google Callback' });
+    }
+  }
+
+  // Endpoint untuk register manual
+  async register(req, res) {
+    try {
+      const { nama, email, password, level_uid } = req.body;
+      
+      if (!nama || !email || !password || !level_uid) {
+        return res.status(400).json({ success: false, message: 'Semua field (nama, email, password, role) wajib diisi' });
+      }
+
+      const result = await authService.registerManual({ nama, email, password, level_uid });
 
       return res.status(201).json({
         success: true,
@@ -17,23 +54,21 @@ class AuthController {
         data: result
       });
     } catch (error) {
-      console.error('Register error:', error);
-      let errorMessage = error.message;
-      if (typeof errorMessage === 'object') errorMessage = JSON.stringify(errorMessage);
-      else if (!errorMessage) errorMessage = typeof error === 'string' ? error : JSON.stringify(error);
-      
-      return res.status(400).json({ success: false, message: errorMessage, error: error });
+      console.error('Register Error:', error);
+      return res.status(500).json({ success: false, message: error.message || 'Gagal registrasi' });
     }
   }
+
+  // Endpoint untuk login manual
   async login(req, res) {
     try {
       const { email, password } = req.body;
-
+      
       if (!email || !password) {
         return res.status(400).json({ success: false, message: 'Email dan password wajib diisi' });
       }
 
-      const result = await authService.login({ email, password });
+      const result = await authService.loginManual({ email, password });
 
       return res.status(200).json({
         success: true,
@@ -41,7 +76,8 @@ class AuthController {
         data: result
       });
     } catch (error) {
-      return res.status(401).json({ success: false, message: error.message });
+      console.error('Login Error:', error);
+      return res.status(401).json({ success: false, message: error.message || 'Gagal login' });
     }
   }
 }

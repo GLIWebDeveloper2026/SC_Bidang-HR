@@ -19,15 +19,15 @@ CREATE TABLE users (
   CONSTRAINT users_level_id_fkey FOREIGN KEY (level_id) REFERENCES level(uid)
 );
 
-CREATE TABLE admin (
+CREATE TABLE master_user_admin (
   uid VARCHAR(36) NOT NULL DEFAULT (UUID()),
   user_id VARCHAR(36) NOT NULL UNIQUE,
   nip VARCHAR(255),
   jabatan VARCHAR(255) DEFAULT 'Staf BKK',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT admin_pkey PRIMARY KEY (uid),
-  CONSTRAINT admin_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(uid)
+  CONSTRAINT master_user_admin_pkey PRIMARY KEY (uid),
+  CONSTRAINT master_user_admin_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(uid)
 );
 
 CREATE TABLE campus (
@@ -39,7 +39,7 @@ CREATE TABLE campus (
   CONSTRAINT campus_pkey PRIMARY KEY (uid)
 );
 
-CREATE TABLE mahasiswa (
+CREATE TABLE master_user_student (
   uid VARCHAR(36) NOT NULL DEFAULT (UUID()),
   user_id VARCHAR(36) NOT NULL UNIQUE,
   campus_id VARCHAR(36) NOT NULL,
@@ -50,12 +50,12 @@ CREATE TABLE mahasiswa (
   is_employed BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT mahasiswa_pkey PRIMARY KEY (uid),
-  CONSTRAINT mahasiswa_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(uid),
-  CONSTRAINT mahasiswa_campus_id_fkey FOREIGN KEY (campus_id) REFERENCES campus(uid)
+  CONSTRAINT master_user_student_pkey PRIMARY KEY (uid),
+  CONSTRAINT master_user_student_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(uid),
+  CONSTRAINT master_user_student_campus_id_fkey FOREIGN KEY (campus_id) REFERENCES campus(uid)
 );
 
-CREATE TABLE perusahaan (
+CREATE TABLE companies (
   uid VARCHAR(36) NOT NULL DEFAULT (UUID()),
   nama_perusahaan VARCHAR(255) NOT NULL,
   alamat TEXT,
@@ -68,23 +68,23 @@ CREATE TABLE perusahaan (
   verified_at TIMESTAMP NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT perusahaan_pkey PRIMARY KEY (uid),
-  CONSTRAINT perusahaan_verified_by_fkey FOREIGN KEY (verified_by) REFERENCES users(uid)
+  CONSTRAINT companies_pkey PRIMARY KEY (uid),
+  CONSTRAINT companies_verified_by_fkey FOREIGN KEY (verified_by) REFERENCES users(uid)
 );
 
-CREATE TABLE hr (
+CREATE TABLE master_user_hr (
   uid VARCHAR(36) NOT NULL DEFAULT (UUID()),
   user_id VARCHAR(36) NOT NULL UNIQUE,
   perusahaan_id VARCHAR(36) NOT NULL,
   jabatan VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT hr_pkey PRIMARY KEY (uid),
-  CONSTRAINT hr_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(uid),
-  CONSTRAINT hr_perusahaan_id_fkey FOREIGN KEY (perusahaan_id) REFERENCES perusahaan(uid)
+  CONSTRAINT master_user_hr_pkey PRIMARY KEY (uid),
+  CONSTRAINT master_user_hr_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(uid),
+  CONSTRAINT master_user_hr_perusahaan_id_fkey FOREIGN KEY (perusahaan_id) REFERENCES companies(uid)
 );
 
-CREATE TABLE recruitment (
+CREATE TABLE recruitments (
   uid VARCHAR(36) NOT NULL DEFAULT (UUID()),
   perusahaan_id VARCHAR(36) NOT NULL,
   judul_pengumuman VARCHAR(255) NOT NULL,
@@ -95,8 +95,8 @@ CREATE TABLE recruitment (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   status VARCHAR(255),
-  CONSTRAINT recruitment_pkey PRIMARY KEY (uid),
-  CONSTRAINT recruitment_perusahaan_id_fkey FOREIGN KEY (perusahaan_id) REFERENCES perusahaan(uid)
+  CONSTRAINT recruitments_pkey PRIMARY KEY (uid),
+  CONSTRAINT recruitments_perusahaan_id_fkey FOREIGN KEY (perusahaan_id) REFERENCES companies(uid)
 );
 
 CREATE TABLE recruitment_positions (
@@ -108,7 +108,7 @@ CREATE TABLE recruitment_positions (
   persyaratan TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT recruitment_positions_pkey PRIMARY KEY (uid),
-  CONSTRAINT recruitment_positions_recruitment_id_fkey FOREIGN KEY (recruitment_id) REFERENCES recruitment(uid)
+  CONSTRAINT recruitment_positions_recruitment_id_fkey FOREIGN KEY (recruitment_id) REFERENCES recruitments(uid)
 );
 
 CREATE TABLE applications (
@@ -122,5 +122,5 @@ CREATE TABLE applications (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT applications_pkey PRIMARY KEY (uid),
   CONSTRAINT applications_position_id_fkey FOREIGN KEY (position_id) REFERENCES recruitment_positions(uid),
-  CONSTRAINT applications_mahasiswa_id_fkey FOREIGN KEY (mahasiswa_id) REFERENCES mahasiswa(uid)
+  CONSTRAINT applications_mahasiswa_id_fkey FOREIGN KEY (mahasiswa_id) REFERENCES master_user_student(uid)
 );
