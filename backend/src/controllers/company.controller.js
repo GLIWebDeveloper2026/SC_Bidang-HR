@@ -1,10 +1,26 @@
 const companyService = require('../services/company.service');
 
+const getProfileId = (req, res) => {
+  const profileId = req.user?.id;
+
+  if (!profileId) {
+    res.status(401).json({
+      success: false,
+      message: 'Belum login atau session telah berakhir'
+    });
+    return null;
+  }
+
+  return profileId;
+};
+
 class CompanyController {
   // POST /api/v1/companies/register
   async registerCompany(req, res) {
     try {
-      const profileId = req.user.id; // Didapat dari Supabase JWT Auth Middleware
+      const profileId = getProfileId(req, res);
+      if (!profileId) return;
+
       const company = await companyService.registerCompany(profileId, req.body);
       return res.status(201).json({
         success: true,
@@ -19,7 +35,9 @@ class CompanyController {
   // POST /api/v1/companies/jobs
   async createJob(req, res) {
     try {
-      const profileId = req.user.id;
+      const profileId = getProfileId(req, res);
+      if (!profileId) return;
+
       const job = await companyService.createJobPosting(profileId, req.body);
       return res.status(201).json({
         success: true,
@@ -34,7 +52,9 @@ class CompanyController {
   // GET /api/v1/companies/applicants
   async getApplicants(req, res) {
     try {
-      const profileId = req.user.id;
+      const profileId = getProfileId(req, res);
+      if (!profileId) return;
+
       const applicants = await companyService.getApplicants(profileId);
       return res.status(200).json({ success: true, data: applicants });
     } catch (error) {

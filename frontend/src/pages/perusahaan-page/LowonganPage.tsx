@@ -1,9 +1,11 @@
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   Box,
   Button,
   Checkbox,
   Chip,
+  CircularProgress,
   Collapse,
   Dialog,
   DialogActions,
@@ -46,6 +48,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { createCompanyJob, getRecruitments, type Recruitment } from '@/api/api';
 import { ButtonCreateLowongan } from '@/components/button/button-lowongan/ButtonCreateLowongan';
 import { DialogCreateLowongan } from '@/components/dialog/dialog-lowongan/DialogCreateLowongan';
 
@@ -82,64 +85,6 @@ export const kategoriOptions = [
   'Operasional',
 ];
 
-const mockLowongan: Lowongan[] = [
-  {
-    id: '1',
-    posisi: 'Frontend Developer',
-    kategori_bidang: 'Teknologi Informasi',
-    kuota_posisi: 3,
-    perusahaan: 'PT Nusantara Digital',
-    lokasi_kerja: 'Jakarta Selatan',
-    status: 'Aktif',
-    deskripsi: 'Mengembangkan antarmuka aplikasi web dan berkolaborasi dengan tim produk.',
-    tanggal: '2026-08-01',
-  },
-  {
-    id: '2',
-    posisi: 'HR Generalist',
-    kategori_bidang: 'Sumber Daya Manusia',
-    kuota_posisi: 2,
-    perusahaan: 'PT Talenta Prima',
-    lokasi_kerja: 'Bandung',
-    status: 'Draft',
-    deskripsi: 'Mengelola administrasi rekrutmen, onboarding, dan kebutuhan karyawan.',
-    tanggal: '2026-07-28',
-  },
-  {
-    id: '3',
-    posisi: 'Finance Staff',
-    kategori_bidang: 'Keuangan',
-    kuota_posisi: 1,
-    perusahaan: 'CV Maju Sejahtera',
-    lokasi_kerja: 'Surabaya',
-    status: 'Ditutup',
-    deskripsi: 'Membantu pencatatan transaksi dan penyusunan laporan keuangan bulanan.',
-    tanggal: '2026-07-20',
-  },
-  {
-    id: '4',
-    posisi: 'Digital Marketing Specialist',
-    kategori_bidang: 'Pemasaran',
-    kuota_posisi: 4,
-    perusahaan: 'PT Kreatif Media',
-    lokasi_kerja: 'Yogyakarta',
-    status: 'Aktif',
-    deskripsi: 'Merancang kampanye pemasaran digital dan menganalisis performa kanal.',
-    tanggal: '2026-07-18',
-  },
-  {
-    id: '5',
-    posisi: 'Operations Supervisor',
-    kategori_bidang: 'Operasional',
-    kuota_posisi: 2,
-    perusahaan: 'PT Logistik Andalan',
-    lokasi_kerja: 'Semarang',
-    status: 'Aktif',
-    deskripsi: 'Mengawasi alur operasional harian dan memastikan target layanan terpenuhi.',
-    tanggal: '2026-07-12',
-  },
-];
-
 const lowonganSchema = z.object({
   posisi: z.string().min(1, 'Posisi wajib diisi'),
   kategori_bidang: z.string().min(1, 'Kategori bidang wajib diisi'),
@@ -169,8 +114,51 @@ const getStatusColor = (status?: LowonganStatus) => {
   return 'warning';
 };
 
+const getLowonganStatus = (tanggalBuka?: string | null, tanggalTutup?: string | null): LowonganStatus => {
+  const today = new Date();
+  const startDate = tanggalBuka ? new Date(tanggalBuka) : null;
+  const endDate = tanggalTutup ? new Date(tanggalTutup) : null;
+
+  if (startDate && today < startDate) return 'Draft';
+  if (endDate && today > endDate) return 'Ditutup';
+  return 'Aktif';
+};
+
+const getErrorMessage = (error: unknown, fallbackMessage: string) => {
+  if (typeof error === 'object' && error !== null && 'response' in error) {
+    const responseData = (error as { response?: { data?: { message?: unknown } } }).response?.data;
+
+    if (typeof responseData?.message === 'string') {
+      return responseData.message;
+    }
+  }
+
+  return error instanceof Error ? error.message : fallbackMessage;
+};
+
+const mapRecruitmentToLowongan = (recruitment: Recruitment): Lowongan => {
+  const primaryPosition = recruitment.positions?.[0];
+  const positionNames = recruitment.positions?.map((position) => position.posisi).filter(Boolean) || [];
+  const totalKuota =
+    recruitment.positions?.reduce((total, position) => total + (Number(position.kuota_posisi) || 0), 0) || 0;
+
+  return {
+    id: recruitment.uid,
+    posisi: positionNames.length > 0 ? positionNames.join(', ') : recruitment.judul_pengumuman,
+    kategori_bidang: primaryPosition?.bidang_industri || '-',
+    kuota_posisi: totalKuota,
+    perusahaan: recruitment.perusahaan?.nama_perusahaan || '-',
+    lokasi_kerja: recruitment.lokasi_kerja || '-',
+    status: getLowonganStatus(recruitment.tanggal_buka, recruitment.tanggal_tutup),
+    deskripsi: recruitment.deskripsi || primaryPosition?.persyaratan || '-',
+    tanggal: recruitment.tanggal_buka || undefined,
+  };
+};
+
 export function LowonganPage() {
-  const [lowongan, setLowongan] = useState<Lowongan[]>(mockLowongan);
+  const [lowongan, setLowongan] = useState<Lowongan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
@@ -201,6 +189,46 @@ export function LowonganPage() {
       tanggal: new Date().toISOString().split('T')[0],
     },
   });
+
+  const allKategoriOptions = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...kategoriOptions,
+          ...lowongan.map((item) => item.kategori_bidang).filter((kategori) => kategori && kategori !== '-'),
+        ])
+      ),
+    [lowongan]
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchRecruitments = async () => {
+      try {
+        const recruitments = await getRecruitments();
+
+        if (isMounted) {
+          setLowongan(recruitments.map(mapRecruitmentToLowongan));
+          setErrorMessage('');
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage(getErrorMessage(error, 'Gagal memuat data lowongan'));
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchRecruitments();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const filteredLowongan = useMemo(() => {
     let result = [...lowongan];
@@ -281,33 +309,49 @@ export function LowonganPage() {
     setSortDirection('asc');
   };
 
-  const handleAddLowongan = (data: LowonganFormData) => {
-    const isDuplicateCompany = lowongan.some(
-      (item) => item.perusahaan.toLowerCase() === data.perusahaan.toLowerCase()
-    );
+  const handleAddLowongan = async (data: LowonganFormData) => {
+    setErrorMessage('');
 
-    if (isDuplicateCompany) {
-      methods.setError('perusahaan', {
-        message: 'Perusahaan harus unik',
+    try {
+      const tanggalTutup = data.tanggal || undefined;
+      const createdJob = await createCompanyJob({
+        judul_pengumuman: data.posisi,
+        deskripsi: data.deskripsi || undefined,
+        lokasi_kerja: data.lokasi_kerja,
+        tanggal_tutup: tanggalTutup,
+        positions: [
+          {
+            posisi: data.posisi,
+            kuota_posisi: data.kuota_posisi,
+            bidang_industri: data.kategori_bidang,
+            persyaratan: data.deskripsi || undefined,
+          },
+        ],
+        stages: [
+          { nama_tahapan: 'Seleksi Berkas', urutan_tahapan: 1 },
+          { nama_tahapan: 'Interview HR', urutan_tahapan: 2 },
+        ],
       });
-      return;
+
+      const newLowongan: Lowongan = {
+        id: createdJob.uid,
+        posisi: data.posisi,
+        kategori_bidang: data.kategori_bidang,
+        kuota_posisi: data.kuota_posisi,
+        perusahaan: data.perusahaan,
+        lokasi_kerja: createdJob.lokasi_kerja || data.lokasi_kerja,
+        status: getLowonganStatus(undefined, createdJob.tanggal_tutup || tanggalTutup),
+        deskripsi: createdJob.deskripsi || data.deskripsi,
+        tanggal: createdJob.tanggal_tutup || tanggalTutup,
+      };
+
+      setLowongan((prev) => [newLowongan, ...prev]);
+      setPage(1);
+      setAddDialogOpen(false);
+      methods.reset();
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error, 'Gagal membuat lowongan'));
     }
-
-    const newLowongan: Lowongan = {
-      id: String(Date.now()),
-      posisi: data.posisi,
-      kategori_bidang: data.kategori_bidang,
-      kuota_posisi: data.kuota_posisi,
-      perusahaan: data.perusahaan,
-      lokasi_kerja: data.lokasi_kerja,
-      status: data.status,
-      deskripsi: data.deskripsi,
-      tanggal: data.tanggal,
-    };
-
-    setLowongan((prev) => [newLowongan, ...prev]);
-    setAddDialogOpen(false);
-    methods.reset();
   };
 
   const confirmDelete = () => {
@@ -424,6 +468,12 @@ export function LowonganPage() {
         )}
       </Box>
 
+      {errorMessage && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {errorMessage}
+        </Alert>
+      )}
+
       <TableContainer
         component={Paper}
         sx={{
@@ -451,7 +501,23 @@ export function LowonganPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedLowongan.map((item) => (
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={10} align="center">
+                  <CircularProgress size={24} />
+                </TableCell>
+              </TableRow>
+            )}
+
+            {!isLoading && paginatedLowongan.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={10} align="center">
+                  Belum ada data lowongan.
+                </TableCell>
+              </TableRow>
+            )}
+
+            {!isLoading && paginatedLowongan.map((item) => (
               <Fragment key={item.id}>
                 <TableRow hover selected={selectedIds.includes(item.id)}>
                   <TableCell padding="checkbox">
@@ -667,7 +733,7 @@ export function LowonganPage() {
             label="Kategori Bidang"
           >
             <MenuItem value="all">Semua Kategori</MenuItem>
-            {kategoriOptions.map((kategori) => (
+            {allKategoriOptions.map((kategori) => (
               <MenuItem key={kategori} value={kategori}>
                 {kategori}
               </MenuItem>
@@ -703,7 +769,7 @@ export function LowonganPage() {
       <DialogCreateLowongan
         open={addDialogOpen}
         methods={methods}
-        kategoriOptions={kategoriOptions}
+        kategoriOptions={allKategoriOptions}
         statusOptions={statusOptions}
         onClose={() => {
           setAddDialogOpen(false);

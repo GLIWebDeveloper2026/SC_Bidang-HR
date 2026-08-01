@@ -24,6 +24,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   loginWithAccessToken: (accessToken: string) => Promise<User>;
   logout: () => Promise<void>;
+  updateUser: (updates: Partial<User>) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -208,6 +209,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [clearAuthState, token]);
 
+  const updateUser = useCallback((updates: Partial<User>) => {
+    setUser((currentUser) => {
+      if (!currentUser) {
+        return currentUser;
+      }
+
+      const updatedUser = normalizeUser({ ...currentUser, ...updates });
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(updatedUser));
+
+      return updatedUser;
+    });
+  }, []);
+
   const isAuthenticated = !!token && !!user;
 
   const contextValue = useMemo(
@@ -219,8 +233,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       login,
       loginWithAccessToken,
       logout,
+      updateUser,
     }),
-    [user, token, isAuthenticated, isLoading, login, loginWithAccessToken, logout]
+    [user, token, isAuthenticated, isLoading, login, loginWithAccessToken, logout, updateUser]
   );
 
   return (

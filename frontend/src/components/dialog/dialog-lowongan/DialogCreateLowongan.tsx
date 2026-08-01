@@ -21,7 +21,7 @@ interface DialogCreateLowonganProps {
   kategoriOptions: string[];
   statusOptions: LowonganStatus[];
   onClose: () => void;
-  onSubmit: (data: LowonganFormData) => void;
+  onSubmit: (data: LowonganFormData) => void | Promise<void>;
 }
 
 export function DialogCreateLowongan({
@@ -32,10 +32,12 @@ export function DialogCreateLowongan({
   onClose,
   onSubmit,
 }: DialogCreateLowonganProps) {
+  const isSubmitting = methods.formState.isSubmitting;
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={isSubmitting ? undefined : onClose}
       maxWidth="sm"
       fullWidth
       PaperProps={{ sx: { borderRadius: 3 } }}
@@ -79,7 +81,7 @@ export function DialogCreateLowongan({
                 label="Status"
                 options={statusOptions.map((status) => ({ value: status, label: status }))}
               />
-              <FormTextField name="tanggal" label="Tanggal" type="date" InputLabelProps={{ shrink: true }} />
+              <FormTextField name="tanggal" label="Tanggal Tutup" type="date" InputLabelProps={{ shrink: true }} />
               <FormTextField
                 name="deskripsi"
                 label="Deskripsi"
@@ -90,11 +92,11 @@ export function DialogCreateLowongan({
             </Box>
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button onClick={onClose} color="inherit">
+            <Button onClick={onClose} color="inherit" disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" variant="contained">
-              Simpan
+            <Button type="submit" variant="contained" disabled={isSubmitting}>
+              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </DialogActions>
         </form>

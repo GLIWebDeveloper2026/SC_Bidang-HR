@@ -7,8 +7,7 @@ class RecruitmentRepository {
       .select(`
         *,
         perusahaan:perusahaan_id (uid, nama_perusahaan, alamat, email, telepon),
-        positions:recruitment_positions (*),
-       
+        positions:recruitment_positions (*)
       `)
       .order('created_at', { ascending: false });
     
@@ -22,7 +21,7 @@ class RecruitmentRepository {
       .select(`
         *,
         perusahaan:perusahaan_id (uid, nama_perusahaan, alamat, email, telepon),
-        positions:recruitment_positions (*),
+        positions:recruitment_positions (*)
       `)
       .eq('uid', id)
       .single();
