@@ -33,7 +33,6 @@ import {
   FilterList as FilterIcon,
   KeyboardArrowRight as ArrowRightIcon,
   Person as PersonIcon,
-  Refresh as RefreshIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
 import {
@@ -203,20 +202,6 @@ export function LamaranPage() {
     setPage(1);
   }, [filterJurusan, filterStatus, searchQuery]);
 
-  const handleRefresh = async () => {
-    setIsLoading(true);
-
-    try {
-      const applications = await getApplications();
-      setLamaran(applications.map(mapApplicationToLamaran));
-      setErrorMessage('');
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error, 'Gagal memuat data lamaran'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const filteredLamaran = useMemo(() => {
     let result = [...lamaran];
 
@@ -317,35 +302,6 @@ export function LamaranPage() {
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 2,
-          mb: 3,
-        }}
-      >
-        <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
-          Lamaran
-        </Typography>
-        <Tooltip title="Muat ulang data lamaran">
-          <span>
-            <IconButton
-              onClick={handleRefresh}
-              disabled={isLoading}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 2,
-              }}
-            >
-              {isLoading ? <CircularProgress size={18} /> : <RefreshIcon fontSize="small" />}
-            </IconButton>
-          </span>
-        </Tooltip>
-      </Box>
-
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
         <TextField
           placeholder="Cari pelamar, NIM, posisi, perusahaan..."

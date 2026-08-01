@@ -60,21 +60,38 @@ export interface Lowongan {
   kategori_bidang: string;
   kuota_posisi: number;
   perusahaan: string;
+  email: string;
+  no_telp: string;
   lokasi_kerja: string;
   status?: LowonganStatus;
   deskripsi?: string;
-  tanggal?: string;
+  tanggal_buka?: string;
+  tanggal_tutup?: string;
 }
 
 type SortDirection = 'asc' | 'desc' | null;
 type SortField =
   | 'posisi'
-  | 'kategori_bidang'
   | 'kuota_posisi'
   | 'perusahaan'
-  | 'lokasi_kerja'
+  | 'email'
+  | 'no_telp'
   | 'status'
-  | 'tanggal';
+  | 'tanggal_buka'
+  | 'tanggal_tutup';
+
+const LOWONGAN_TABLE_COL_SPAN = 11;
+
+const sortableColumnSx: Partial<Record<SortField, { width: number; minWidth: number }>> = {
+  posisi: { width: 220, minWidth: 220 },
+  kuota_posisi: { width: 90, minWidth: 90 },
+  perusahaan: { width: 180, minWidth: 180 },
+  email: { width: 220, minWidth: 220 },
+  no_telp: { width: 140, minWidth: 140 },
+  status: { width: 120, minWidth: 120 },
+  tanggal_buka: { width: 140, minWidth: 140 },
+  tanggal_tutup: { width: 140, minWidth: 140 },
+};
 
 export const statusOptions: LowonganStatus[] = ['Aktif', 'Ditutup', 'Draft'];
 export const kategoriOptions = [
@@ -148,10 +165,13 @@ const mapRecruitmentToLowongan = (recruitment: Recruitment): Lowongan => {
     kategori_bidang: primaryPosition?.bidang_industri || '-',
     kuota_posisi: totalKuota,
     perusahaan: recruitment.perusahaan?.nama_perusahaan || '-',
+    email: recruitment.perusahaan?.email || '-',
+    no_telp: recruitment.perusahaan?.telepon || '-',
     lokasi_kerja: recruitment.lokasi_kerja || '-',
     status: getLowonganStatus(recruitment.tanggal_buka, recruitment.tanggal_tutup),
     deskripsi: recruitment.deskripsi || primaryPosition?.persyaratan || '-',
-    tanggal: recruitment.tanggal_buka || undefined,
+    tanggal_buka: recruitment.tanggal_buka || undefined,
+    tanggal_tutup: recruitment.tanggal_tutup || undefined,
   };
 };
 
@@ -239,7 +259,10 @@ export function LowonganPage() {
         (item) =>
           item.posisi.toLowerCase().includes(query) ||
           item.perusahaan.toLowerCase().includes(query) ||
-          item.lokasi_kerja.toLowerCase().includes(query)
+          item.email.toLowerCase().includes(query) ||
+          item.no_telp.toLowerCase().includes(query) ||
+          item.lokasi_kerja.toLowerCase().includes(query) ||
+          (item.deskripsi || '').toLowerCase().includes(query)
       );
     }
 
@@ -338,11 +361,14 @@ export function LowonganPage() {
         posisi: data.posisi,
         kategori_bidang: data.kategori_bidang,
         kuota_posisi: data.kuota_posisi,
-        perusahaan: data.perusahaan,
+        perusahaan: createdJob.perusahaan?.nama_perusahaan || data.perusahaan,
+        email: createdJob.perusahaan?.email || '-',
+        no_telp: createdJob.perusahaan?.telepon || '-',
         lokasi_kerja: createdJob.lokasi_kerja || data.lokasi_kerja,
-        status: getLowonganStatus(undefined, createdJob.tanggal_tutup || tanggalTutup),
-        deskripsi: createdJob.deskripsi || data.deskripsi,
-        tanggal: createdJob.tanggal_tutup || tanggalTutup,
+        status: getLowonganStatus(createdJob.tanggal_buka, createdJob.tanggal_tutup || tanggalTutup),
+        deskripsi: createdJob.deskripsi || data.deskripsi || '-',
+        tanggal_buka: createdJob.tanggal_buka || undefined,
+        tanggal_tutup: createdJob.tanggal_tutup || tanggalTutup,
       };
 
       setLowongan((prev) => [newLowongan, ...prev]);
@@ -382,6 +408,7 @@ export function LowonganPage() {
     <TableCell
       onClick={() => handleSort(field)}
       sx={{
+        ...sortableColumnSx[field],
         cursor: 'pointer',
         fontWeight: 600,
         userSelect: 'none',
@@ -396,24 +423,21 @@ export function LowonganPage() {
     </TableCell>
   );
 
+  const renderCellText = (value?: string | number | null, fontWeight?: number) => {
+    const displayValue = value === undefined || value === null || value === '' ? '-' : String(value);
+
+    return (
+      <Tooltip title={displayValue === '-' ? '' : displayValue}>
+        <Typography variant="body2" noWrap sx={{ fontWeight }}>
+          {displayValue}
+        </Typography>
+      </Tooltip>
+    );
+  };
+
   return (
     <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 2,
-          mb: 3,
-        }}
-      >
-        <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
-          Lowongan
-        </Typography>
-        <ButtonCreateLowongan onClick={() => setAddDialogOpen(true)} />
-      </Box>
-
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1, mb: 2, flexWrap: 'wrap' }}>
         <Tooltip title={selectedIds.length > 0 ? 'Hapus pilihan' : 'Pilih data untuk menghapus'}>
           <span>
             <IconButton
@@ -432,7 +456,7 @@ export function LowonganPage() {
         </Tooltip>
 
         <TextField
-          placeholder="Cari posisi, perusahaan, lokasi..."
+          placeholder="Cari posisi, perusahaan, email, no telp..."
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
           size="small"
@@ -466,6 +490,10 @@ export function LowonganPage() {
         {(filterKategori !== 'all' || filterStatus !== 'all') && (
           <Chip label="Filter aktif" size="small" onDelete={clearFilters} color="primary" variant="outlined" />
         )}
+
+        <Box sx={{ ml: { sm: 'auto' }, mt: { xs: 0, sm: 0.5 } }}>
+          <ButtonCreateLowongan onClick={() => setAddDialogOpen(true)} />
+        </Box>
       </Box>
 
       {errorMessage && (
@@ -483,7 +511,7 @@ export function LowonganPage() {
           boxShadow: 'none',
         }}
       >
-        <Table>
+        <Table size="small" sx={{ minWidth: 1400, tableLayout: 'fixed' }}>
           <TableHead>
             <TableRow>
               <TableCell padding="checkbox" sx={{ width: 48 }}>
@@ -491,19 +519,20 @@ export function LowonganPage() {
               </TableCell>
               <TableCell sx={{ width: 48 }} />
               {renderSortableHeader('Posisi', 'posisi')}
-              {renderSortableHeader('Kategori Bidang', 'kategori_bidang')}
               {renderSortableHeader('Kuota', 'kuota_posisi')}
               {renderSortableHeader('Perusahaan', 'perusahaan')}
-              {renderSortableHeader('Lokasi Kerja', 'lokasi_kerja')}
+              {renderSortableHeader('Email', 'email')}
+              {renderSortableHeader('No Telp', 'no_telp')}
+              {renderSortableHeader('Tanggal Buka', 'tanggal_buka')}
+              {renderSortableHeader('Tanggal Tutup', 'tanggal_tutup')}
               {renderSortableHeader('Status', 'status')}
-              {renderSortableHeader('Tanggal', 'tanggal')}
-              <TableCell sx={{ width: 48 }} />
+              <TableCell sx={{ width: 56 }} />
             </TableRow>
           </TableHead>
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={10} align="center">
+                <TableCell colSpan={LOWONGAN_TABLE_COL_SPAN} align="center">
                   <CircularProgress size={24} />
                 </TableCell>
               </TableRow>
@@ -511,7 +540,7 @@ export function LowonganPage() {
 
             {!isLoading && paginatedLowongan.length === 0 && (
               <TableRow>
-                <TableCell colSpan={10} align="center">
+                <TableCell colSpan={LOWONGAN_TABLE_COL_SPAN} align="center">
                   Belum ada data lowongan.
                 </TableCell>
               </TableRow>
@@ -539,12 +568,13 @@ export function LowonganPage() {
                       <ArrowRightIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={sortableColumnSx.posisi}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                       <Box
                         sx={{
                           width: 36,
                           height: 36,
+                          flexShrink: 0,
                           borderRadius: 1,
                           bgcolor: 'primary.main',
                           color: 'white',
@@ -555,16 +585,16 @@ export function LowonganPage() {
                       >
                         <WorkIcon fontSize="small" />
                       </Box>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {item.posisi}
-                      </Typography>
+                      <Box sx={{ minWidth: 0 }}>{renderCellText(item.posisi, 500)}</Box>
                     </Box>
                   </TableCell>
-                  <TableCell>{item.kategori_bidang}</TableCell>
-                  <TableCell>{item.kuota_posisi}</TableCell>
-                  <TableCell>{item.perusahaan}</TableCell>
-                  <TableCell>{item.lokasi_kerja}</TableCell>
-                  <TableCell>
+                  <TableCell sx={sortableColumnSx.kuota_posisi}>{renderCellText(item.kuota_posisi)}</TableCell>
+                  <TableCell sx={sortableColumnSx.perusahaan}>{renderCellText(item.perusahaan)}</TableCell>
+                  <TableCell sx={sortableColumnSx.email}>{renderCellText(item.email)}</TableCell>
+                  <TableCell sx={sortableColumnSx.no_telp}>{renderCellText(item.no_telp)}</TableCell>
+                  <TableCell sx={sortableColumnSx.tanggal_buka}>{renderCellText(formatDate(item.tanggal_buka))}</TableCell>
+                  <TableCell sx={sortableColumnSx.tanggal_tutup}>{renderCellText(formatDate(item.tanggal_tutup))}</TableCell>
+                  <TableCell sx={sortableColumnSx.status}>
                     <Chip
                       label={item.status || '-'}
                       size="small"
@@ -572,8 +602,7 @@ export function LowonganPage() {
                       sx={{ fontWeight: 500 }}
                     />
                   </TableCell>
-                  <TableCell>{formatDate(item.tanggal)}</TableCell>
-                  <TableCell>
+                  <TableCell sx={{ width: 56 }}>
                     <IconButton
                       size="small"
                       onClick={(event) => {
@@ -587,7 +616,10 @@ export function LowonganPage() {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell colSpan={10} sx={{ py: 0, borderBottom: expandedRows.includes(item.id) ? undefined : 'none' }}>
+                  <TableCell
+                    colSpan={LOWONGAN_TABLE_COL_SPAN}
+                    sx={{ py: 0, borderBottom: expandedRows.includes(item.id) ? undefined : 'none' }}
+                  >
                     <Collapse in={expandedRows.includes(item.id)} timeout="auto" unmountOnExit>
                       <Box sx={{ py: 2, px: 3, bgcolor: 'action.hover', borderRadius: 1, my: 1 }}>
                         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
@@ -608,15 +640,39 @@ export function LowonganPage() {
                           </Box>
                           <Box>
                             <Typography variant="caption" color="text.secondary">
+                              Email
+                            </Typography>
+                            <Typography variant="body2">{item.email}</Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              No Telp
+                            </Typography>
+                            <Typography variant="body2">{item.no_telp}</Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Kategori Bidang
+                            </Typography>
+                            <Typography variant="body2">{item.kategori_bidang}</Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
                               Lokasi Kerja
                             </Typography>
                             <Typography variant="body2">{item.lokasi_kerja}</Typography>
                           </Box>
                           <Box>
                             <Typography variant="caption" color="text.secondary">
-                              Tanggal
+                              Tanggal Buka
                             </Typography>
-                            <Typography variant="body2">{formatDate(item.tanggal)}</Typography>
+                            <Typography variant="body2">{formatDate(item.tanggal_buka)}</Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Tanggal Tutup
+                            </Typography>
+                            <Typography variant="body2">{formatDate(item.tanggal_tutup)}</Typography>
                           </Box>
                           <Box sx={{ gridColumn: { md: '1 / -1' } }}>
                             <Typography variant="caption" color="text.secondary">

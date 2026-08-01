@@ -8,10 +8,11 @@ import {
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
-  Person as PersonIcon,
   Group as GroupIcon,
   Folder as FolderIcon,
   MoreHoriz as MoreHorizIcon,
+  Work as WorkIcon,
+  AssignmentTurnedIn as AssignmentTurnedInIcon,
 } from '@mui/icons-material';
 import { NavItem } from './NavItem';
 import { useAuth } from '@/hooks';
@@ -38,12 +39,12 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
     {
       label: 'Lowongan',
       path: '/lowongan',
-      icon: <PersonIcon fontSize="small" />,
+      icon: <WorkIcon fontSize="small" />,
     },
     {
       label: 'Lamaran',
       path: '/lamaran',
-      icon: <PersonIcon fontSize="small" />,
+      icon: <AssignmentTurnedInIcon fontSize="small" />,
     },
     {
       label: 'User',
