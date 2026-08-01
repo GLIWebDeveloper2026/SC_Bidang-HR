@@ -1,20 +1,15 @@
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   Box,
   Button,
-  Checkbox,
   Chip,
+  CircularProgress,
   Collapse,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
   FormControl,
   IconButton,
   InputAdornment,
   InputLabel,
-  Menu,
   MenuItem,
   Pagination,
   Paper,
@@ -34,22 +29,18 @@ import {
 import {
   ArrowDownward as ArrowDownIcon,
   ArrowUpward as ArrowUpIcon,
-  Delete as DeleteIcon,
-  Edit as EditIcon,
+  Description as DocumentIcon,
   FilterList as FilterIcon,
-  HowToReg as ApplyIcon,
   KeyboardArrowRight as ArrowRightIcon,
-  MoreVert as MoreVertIcon,
+  Person as PersonIcon,
+  Refresh as RefreshIcon,
   Search as SearchIcon,
-  Visibility as ViewIcon,
-  Work as WorkIcon,
 } from '@mui/icons-material';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { ButtonCreateLowongan } from '@/components/button/button-lowongan/ButtonCreateLowongan';
-import { DialogCreateLamaran } from '@/components/dialog/dialog-lamaran/DialogCreateLamaran';
-import { DialogCreateLowongan } from '@/components/dialog/dialog-lowongan/DialogCreateLowongan';
+import {
+  getApplications,
+  type Application,
+  type ApplicationStatus,
+} from '@/api/api';
 
 export type LowonganStatus = 'Aktif' | 'Ditutup' | 'Draft';
 
@@ -65,96 +56,6 @@ export interface Lowongan {
   tanggal?: string;
 }
 
-type SortDirection = 'asc' | 'desc' | null;
-type SortField =
-  | 'posisi'
-  | 'kategori_bidang'
-  | 'kuota_posisi'
-  | 'perusahaan'
-  | 'lokasi_kerja'
-  | 'status'
-  | 'tanggal';
-
-export const statusOptions: LowonganStatus[] = ['Aktif', 'Ditutup', 'Draft'];
-export const kategoriOptions = [
-  'Teknologi Informasi',
-  'Sumber Daya Manusia',
-  'Keuangan',
-  'Pemasaran',
-  'Operasional',
-];
-
-const mockLowongan: Lowongan[] = [
-  {
-    id: '1',
-    posisi: 'Frontend Developer',
-    kategori_bidang: 'Teknologi Informasi',
-    kuota_posisi: 3,
-    perusahaan: 'PT Nusantara Digital',
-    lokasi_kerja: 'Jakarta Selatan',
-    status: 'Aktif',
-    deskripsi: 'Mengembangkan antarmuka aplikasi web dan berkolaborasi dengan tim produk.',
-    tanggal: '2026-08-01',
-  },
-  {
-    id: '2',
-    posisi: 'HR Generalist',
-    kategori_bidang: 'Sumber Daya Manusia',
-    kuota_posisi: 2,
-    perusahaan: 'PT Talenta Prima',
-    lokasi_kerja: 'Bandung',
-    status: 'Draft',
-    deskripsi: 'Mengelola administrasi rekrutmen, onboarding, dan kebutuhan karyawan.',
-    tanggal: '2026-07-28',
-  },
-  {
-    id: '3',
-    posisi: 'Finance Staff',
-    kategori_bidang: 'Keuangan',
-    kuota_posisi: 1,
-    perusahaan: 'CV Maju Sejahtera',
-    lokasi_kerja: 'Surabaya',
-    status: 'Ditutup',
-    deskripsi: 'Membantu pencatatan transaksi dan penyusunan laporan keuangan bulanan.',
-    tanggal: '2026-07-20',
-  },
-  {
-    id: '4',
-    posisi: 'Digital Marketing Specialist',
-    kategori_bidang: 'Pemasaran',
-    kuota_posisi: 4,
-    perusahaan: 'PT Kreatif Media',
-    lokasi_kerja: 'Yogyakarta',
-    status: 'Aktif',
-    deskripsi: 'Merancang kampanye pemasaran digital dan menganalisis performa kanal.',
-    tanggal: '2026-07-18',
-  },
-  {
-    id: '5',
-    posisi: 'Operations Supervisor',
-    kategori_bidang: 'Operasional',
-    kuota_posisi: 2,
-    perusahaan: 'PT Logistik Andalan',
-    lokasi_kerja: 'Semarang',
-    status: 'Aktif',
-    deskripsi: 'Mengawasi alur operasional harian dan memastikan target layanan terpenuhi.',
-    tanggal: '2026-07-12',
-  },
-];
-
-const lowonganSchema = z.object({
-  posisi: z.string().min(1, 'Posisi wajib diisi'),
-  kategori_bidang: z.string().min(1, 'Kategori bidang wajib diisi'),
-  kuota_posisi: z.coerce.number().int('Kuota harus berupa angka bulat').min(1, 'Kuota minimal 1'),
-  perusahaan: z.string().min(1, 'Perusahaan wajib diisi'),
-  lokasi_kerja: z.string().min(1, 'Lokasi kerja wajib diisi'),
-  status: z.enum(['Aktif', 'Ditutup', 'Draft']).optional(),
-  deskripsi: z.string().optional(),
-  tanggal: z.string().optional(),
-});
-
-export type LowonganFormData = z.infer<typeof lowonganSchema>;
-
 export interface LamaranFormData {
   surat_lamaran: string;
   cv: File | null;
@@ -164,137 +65,198 @@ export interface LamaranFormData {
   setuju_syarat: boolean;
 }
 
-const lamaranSchema = z.object({
-  surat_lamaran: z.string().min(1, 'Surat lamaran wajib diisi'),
-  cv: z.custom<File>((file) => file instanceof File, 'CV wajib diupload'),
-  nomor_hp: z.string().min(1, 'Nomor HP wajib diisi'),
-  pendidikan: z.string().min(1, 'Pendidikan wajib diisi'),
-  harapan_salary: z.coerce.number().min(1, 'Harapan salary wajib diisi'),
-  setuju_syarat: z.literal(true, {
-    errorMap: () => ({ message: 'Syarat dan ketentuan wajib disetujui' }),
-  }),
-});
+interface LamaranRow {
+  id: string;
+  pelamar: string;
+  email: string;
+  nim: string;
+  jurusan: string;
+  tahunLulus: string;
+  posisi: string;
+  bidangIndustri: string;
+  judulPengumuman: string;
+  perusahaan: string;
+  status: ApplicationStatus;
+  cvUrl: string;
+  tanggal: string;
+  hiredAt: string;
+}
 
-const formatDate = (dateStr?: string): string => {
+type SortDirection = 'asc' | 'desc' | null;
+type SortField =
+  | 'pelamar'
+  | 'nim'
+  | 'jurusan'
+  | 'posisi'
+  | 'perusahaan'
+  | 'status'
+  | 'tanggal';
+
+const statusOptions: ApplicationStatus[] = ['IN_PROGRESS', 'HIRED', 'REJECTED'];
+
+const statusLabels: Record<ApplicationStatus, string> = {
+  IN_PROGRESS: 'Dalam Proses',
+  HIRED: 'Diterima',
+  REJECTED: 'Ditolak',
+};
+
+const getErrorMessage = (error: unknown, fallbackMessage: string) => {
+  if (typeof error === 'object' && error !== null && 'response' in error) {
+    const responseData = (error as { response?: { data?: { message?: unknown } } }).response?.data;
+
+    if (typeof responseData?.message === 'string') {
+      return responseData.message;
+    }
+  }
+
+  return error instanceof Error ? error.message : fallbackMessage;
+};
+
+const formatDate = (dateStr?: string | null): string => {
   if (!dateStr) return '-';
 
-  return new Date(dateStr).toLocaleDateString('id-ID', {
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return '-';
+
+  return date.toLocaleDateString('id-ID', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   });
 };
 
-const getStatusColor = (status?: LowonganStatus) => {
-  if (status === 'Aktif') return 'success';
-  if (status === 'Ditutup') return 'default';
+const getStatusColor = (status: ApplicationStatus) => {
+  if (status === 'HIRED') return 'success';
+  if (status === 'REJECTED') return 'error';
   return 'warning';
 };
 
+const mapApplicationToLamaran = (application: Application): LamaranRow => ({
+  id: application.uid,
+  pelamar: application.mahasiswa?.profiles?.nama || '-',
+  email: application.mahasiswa?.profiles?.email || '-',
+  nim: application.mahasiswa?.nim || '-',
+  jurusan: application.mahasiswa?.jurusan || '-',
+  tahunLulus: application.mahasiswa?.tahun_lulus ? String(application.mahasiswa.tahun_lulus) : '-',
+  posisi: application.position?.posisi || '-',
+  bidangIndustri: application.position?.bidang_industri || '-',
+  judulPengumuman: application.position?.recruitment?.judul_pengumuman || '-',
+  perusahaan: application.position?.recruitment?.perusahaan?.nama_perusahaan || '-',
+  status: application.status,
+  cvUrl: application.snapshot_cv_url || '',
+  tanggal: application.created_at || '',
+  hiredAt: application.hired_at || '',
+});
+
 export function LamaranPage() {
-  const [lowongan, setLowongan] = useState<Lowongan[]>(mockLowongan);
+  const [lamaran, setLamaran] = useState<LamaranRow[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
-  const [sortField, setSortField] = useState<SortField | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [sortField, setSortField] = useState<SortField | null>('tanggal');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(8);
-
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<HTMLElement | null>(null);
-  const [actionMenuLowonganId, setActionMenuLowonganId] = useState<string | null>(null);
-  const [applyDialogOpen, setApplyDialogOpen] = useState(false);
-  const [selectedLowonganForApply, setSelectedLowonganForApply] = useState<Lowongan | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<ApplicationStatus | 'all'>('all');
+  const [filterJurusan, setFilterJurusan] = useState('all');
 
-  const [filterKategori, setFilterKategori] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const jurusanOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(lamaran.map((item) => item.jurusan).filter((jurusan) => jurusan && jurusan !== '-'))
+      ),
+    [lamaran]
+  );
 
-  const methods = useForm<LowonganFormData>({
-    resolver: zodResolver(lowonganSchema),
-    defaultValues: {
-      posisi: '',
-      kategori_bidang: '',
-      kuota_posisi: 1,
-      perusahaan: '',
-      lokasi_kerja: '',
-      status: 'Draft',
-      deskripsi: '',
-      tanggal: new Date().toISOString().split('T')[0],
-    },
-  });
+  useEffect(() => {
+    let isMounted = true;
 
-  const lamaranMethods = useForm<LamaranFormData>({
-    resolver: zodResolver(lamaranSchema),
-    defaultValues: {
-      surat_lamaran: '',
-      cv: null,
-      nomor_hp: '',
-      pendidikan: '',
-      harapan_salary: 0,
-      setuju_syarat: false,
-    },
-  });
+    const fetchApplications = async () => {
+      try {
+        const applications = await getApplications();
 
-  const filteredLowongan = useMemo(() => {
-    let result = [...lowongan];
+        if (isMounted) {
+          setLamaran(applications.map(mapApplicationToLamaran));
+          setErrorMessage('');
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage(getErrorMessage(error, 'Gagal memuat data lamaran'));
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchApplications();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filterJurusan, filterStatus, searchQuery]);
+
+  const handleRefresh = async () => {
+    setIsLoading(true);
+
+    try {
+      const applications = await getApplications();
+      setLamaran(applications.map(mapApplicationToLamaran));
+      setErrorMessage('');
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error, 'Gagal memuat data lamaran'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredLamaran = useMemo(() => {
+    let result = [...lamaran];
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (item) =>
+          item.pelamar.toLowerCase().includes(query) ||
+          item.email.toLowerCase().includes(query) ||
+          item.nim.toLowerCase().includes(query) ||
+          item.jurusan.toLowerCase().includes(query) ||
           item.posisi.toLowerCase().includes(query) ||
-          item.perusahaan.toLowerCase().includes(query) ||
-          item.lokasi_kerja.toLowerCase().includes(query)
+          item.perusahaan.toLowerCase().includes(query)
       );
-    }
-
-    if (filterKategori !== 'all') {
-      result = result.filter((item) => item.kategori_bidang === filterKategori);
     }
 
     if (filterStatus !== 'all') {
       result = result.filter((item) => item.status === filterStatus);
     }
 
+    if (filterJurusan !== 'all') {
+      result = result.filter((item) => item.jurusan === filterJurusan);
+    }
+
     if (sortField && sortDirection) {
       result.sort((a, b) => {
-        const aValue = a[sortField] ?? '';
-        const bValue = b[sortField] ?? '';
-        const comparison =
-          typeof aValue === 'number' && typeof bValue === 'number'
-            ? aValue - bValue
-            : String(aValue).localeCompare(String(bValue));
-
+        const comparison = String(a[sortField] ?? '').localeCompare(String(b[sortField] ?? ''));
         return sortDirection === 'asc' ? comparison : -comparison;
       });
     }
 
     return result;
-  }, [filterKategori, filterStatus, lowongan, searchQuery, sortDirection, sortField]);
+  }, [filterJurusan, filterStatus, lamaran, searchQuery, sortDirection, sortField]);
 
-  const paginatedLowongan = useMemo(() => {
+  const paginatedLamaran = useMemo(() => {
     const startIndex = (page - 1) * rowsPerPage;
-    return filteredLowongan.slice(startIndex, startIndex + rowsPerPage);
-  }, [filteredLowongan, page, rowsPerPage]);
+    return filteredLamaran.slice(startIndex, startIndex + rowsPerPage);
+  }, [filteredLamaran, page, rowsPerPage]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredLowongan.length / rowsPerPage));
-  const isAllSelected =
-    paginatedLowongan.length > 0 &&
-    paginatedLowongan.every((item) => selectedIds.includes(item.id));
-  const isSomeSelected = selectedIds.length > 0 && !isAllSelected;
-
-  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedIds(event.target.checked ? paginatedLowongan.map((item) => item.id) : []);
-  };
-
-  const handleSelectOne = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
-    );
-  };
+  const totalPages = Math.max(1, Math.ceil(filteredLamaran.length / rowsPerPage));
 
   const handleExpandRow = (id: string) => {
     setExpandedRows((prev) =>
@@ -317,78 +279,10 @@ export function LamaranPage() {
     setSortDirection('asc');
   };
 
-  const handleAddLowongan = (data: LowonganFormData) => {
-    const isDuplicateCompany = lowongan.some(
-      (item) => item.perusahaan.toLowerCase() === data.perusahaan.toLowerCase()
-    );
-
-    if (isDuplicateCompany) {
-      methods.setError('perusahaan', {
-        message: 'Perusahaan harus unik',
-      });
-      return;
-    }
-
-    const newLowongan: Lowongan = {
-      id: String(Date.now()),
-      posisi: data.posisi,
-      kategori_bidang: data.kategori_bidang,
-      kuota_posisi: data.kuota_posisi,
-      perusahaan: data.perusahaan,
-      lokasi_kerja: data.lokasi_kerja,
-      status: data.status,
-      deskripsi: data.deskripsi,
-      tanggal: data.tanggal,
-    };
-
-    setLowongan((prev) => [newLowongan, ...prev]);
-    setAddDialogOpen(false);
-    methods.reset();
-  };
-
-  const confirmDelete = () => {
-    setLowongan((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
-    setSelectedIds([]);
-    setDeleteDialogOpen(false);
-  };
-
   const clearFilters = () => {
-    setFilterKategori('all');
     setFilterStatus('all');
+    setFilterJurusan('all');
     setSearchQuery('');
-  };
-
-  const handleOpenApplyDialog = () => {
-    const selectedLowongan = lowongan.find((item) => item.id === actionMenuLowonganId);
-
-    if (selectedLowongan) {
-      setSelectedLowonganForApply(selectedLowongan);
-      setApplyDialogOpen(true);
-    }
-
-    setActionMenuAnchorEl(null);
-    setActionMenuLowonganId(null);
-  };
-
-  const handleCloseApplyDialog = () => {
-    setApplyDialogOpen(false);
-    setSelectedLowonganForApply(null);
-    lamaranMethods.reset();
-  };
-
-  const handleSubmitLamaran = (data: LamaranFormData) => {
-    const submittedLamaran = {
-      ...data,
-      lowongan_id: selectedLowonganForApply?.id,
-      posisi: selectedLowonganForApply?.posisi,
-      kategori_bidang: selectedLowonganForApply?.kategori_bidang,
-      kuota_posisi: selectedLowonganForApply?.kuota_posisi,
-      perusahaan: selectedLowonganForApply?.perusahaan,
-      lokasi_kerja: selectedLowonganForApply?.lokasi_kerja,
-    };
-
-    console.log('Lamaran submitted:', submittedLamaran);
-    handleCloseApplyDialog();
   };
 
   const getSortIcon = (field: SortField) => {
@@ -433,31 +327,28 @@ export function LamaranPage() {
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
-          Lowongan
+          Lamaran
         </Typography>
-        <ButtonCreateLowongan onClick={() => setAddDialogOpen(true)} />
-      </Box>
-
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-        <Tooltip title={selectedIds.length > 0 ? 'Hapus pilihan' : 'Pilih data untuk menghapus'}>
+        <Tooltip title="Muat ulang data lamaran">
           <span>
             <IconButton
-              onClick={() => setDeleteDialogOpen(true)}
-              disabled={selectedIds.length === 0}
+              onClick={handleRefresh}
+              disabled={isLoading}
               sx={{
                 border: '1px solid',
                 borderColor: 'divider',
                 borderRadius: 2,
-                color: selectedIds.length > 0 ? 'error.main' : 'text.secondary',
               }}
             >
-              <DeleteIcon fontSize="small" />
+              {isLoading ? <CircularProgress size={18} /> : <RefreshIcon fontSize="small" />}
             </IconButton>
           </span>
         </Tooltip>
+      </Box>
 
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
         <TextField
-          placeholder="Cari posisi, perusahaan, lokasi..."
+          placeholder="Cari pelamar, NIM, posisi, perusahaan..."
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
           size="small"
@@ -469,7 +360,7 @@ export function LamaranPage() {
             ),
           }}
           sx={{
-            minWidth: { xs: '100%', sm: 280 },
+            minWidth: { xs: '100%', sm: 340 },
             '& .MuiOutlinedInput-root': { borderRadius: 2 },
           }}
         />
@@ -488,10 +379,16 @@ export function LamaranPage() {
           Filter
         </Button>
 
-        {(filterKategori !== 'all' || filterStatus !== 'all') && (
+        {(filterStatus !== 'all' || filterJurusan !== 'all') && (
           <Chip label="Filter aktif" size="small" onDelete={clearFilters} color="primary" variant="outlined" />
         )}
       </Box>
+
+      {errorMessage && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {errorMessage}
+        </Alert>
+      )}
 
       <TableContainer
         component={Paper}
@@ -505,135 +402,163 @@ export function LamaranPage() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox" sx={{ width: 48 }}>
-                <Checkbox checked={isAllSelected} indeterminate={isSomeSelected} onChange={handleSelectAll} />
-              </TableCell>
               <TableCell sx={{ width: 48 }} />
+              {renderSortableHeader('Pelamar', 'pelamar')}
+              {renderSortableHeader('NIM', 'nim')}
+              {renderSortableHeader('Jurusan', 'jurusan')}
               {renderSortableHeader('Posisi', 'posisi')}
-              {renderSortableHeader('Kategori Bidang', 'kategori_bidang')}
-              {renderSortableHeader('Kuota', 'kuota_posisi')}
               {renderSortableHeader('Perusahaan', 'perusahaan')}
-              {renderSortableHeader('Lokasi Kerja', 'lokasi_kerja')}
               {renderSortableHeader('Status', 'status')}
               {renderSortableHeader('Tanggal', 'tanggal')}
-              <TableCell sx={{ width: 48 }} />
+              <TableCell sx={{ width: 64, fontWeight: 600 }}>CV</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedLowongan.map((item) => (
-              <Fragment key={item.id}>
-                <TableRow hover selected={selectedIds.includes(item.id)}>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedIds.includes(item.id)}
-                      onChange={() => handleSelectOne(item.id)}
-                      onClick={(event) => event.stopPropagation()}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleExpandRow(item.id)}
-                      sx={{
-                        transition: 'transform 0.2s',
-                        transform: expandedRows.includes(item.id) ? 'rotate(90deg)' : 'rotate(0deg)',
-                      }}
-                    >
-                      <ArrowRightIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <Box
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                  <CircularProgress size={24} />
+                </TableCell>
+              </TableRow>
+            )}
+
+            {!isLoading && paginatedLamaran.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                  Belum ada data lamaran.
+                </TableCell>
+              </TableRow>
+            )}
+
+            {!isLoading &&
+              paginatedLamaran.map((item) => (
+                <Fragment key={item.id}>
+                  <TableRow hover>
+                    <TableCell>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleExpandRow(item.id)}
                         sx={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: 1,
-                          bgcolor: 'primary.main',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          transition: 'transform 0.2s',
+                          transform: expandedRows.includes(item.id) ? 'rotate(90deg)' : 'rotate(0deg)',
                         }}
                       >
-                        <WorkIcon fontSize="small" />
-                      </Box>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {item.posisi}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>{item.kategori_bidang}</TableCell>
-                  <TableCell>{item.kuota_posisi}</TableCell>
-                  <TableCell>{item.perusahaan}</TableCell>
-                  <TableCell>{item.lokasi_kerja}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={item.status || '-'}
-                      size="small"
-                      color={getStatusColor(item.status)}
-                      sx={{ fontWeight: 500 }}
-                    />
-                  </TableCell>
-                  <TableCell>{formatDate(item.tanggal)}</TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setActionMenuAnchorEl(event.currentTarget);
-                        setActionMenuLowonganId(item.id);
-                      }}
-                    >
-                      <MoreVertIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell colSpan={10} sx={{ py: 0, borderBottom: expandedRows.includes(item.id) ? undefined : 'none' }}>
-                    <Collapse in={expandedRows.includes(item.id)} timeout="auto" unmountOnExit>
-                      <Box sx={{ py: 2, px: 3, bgcolor: 'action.hover', borderRadius: 1, my: 1 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                          Detail Lowongan
-                        </Typography>
+                        <ArrowRightIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                         <Box
                           sx={{
-                            display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
-                            gap: 2,
+                            width: 36,
+                            height: 36,
+                            borderRadius: 1,
+                            bgcolor: 'primary.main',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
                           }}
                         >
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">
-                              Perusahaan
-                            </Typography>
-                            <Typography variant="body2">{item.perusahaan}</Typography>
-                          </Box>
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">
-                              Lokasi Kerja
-                            </Typography>
-                            <Typography variant="body2">{item.lokasi_kerja}</Typography>
-                          </Box>
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">
-                              Tanggal
-                            </Typography>
-                            <Typography variant="body2">{formatDate(item.tanggal)}</Typography>
-                          </Box>
-                          <Box sx={{ gridColumn: { md: '1 / -1' } }}>
-                            <Typography variant="caption" color="text.secondary">
-                              Deskripsi
-                            </Typography>
-                            <Typography variant="body2">{item.deskripsi || '-'}</Typography>
-                          </Box>
+                          <PersonIcon fontSize="small" />
+                        </Box>
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {item.pelamar}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {item.email}
+                          </Typography>
                         </Box>
                       </Box>
-                    </Collapse>
-                  </TableCell>
-                </TableRow>
-              </Fragment>
-            ))}
+                    </TableCell>
+                    <TableCell>{item.nim}</TableCell>
+                    <TableCell>{item.jurusan}</TableCell>
+                    <TableCell>{item.posisi}</TableCell>
+                    <TableCell>{item.perusahaan}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={statusLabels[item.status] || item.status}
+                        size="small"
+                        color={getStatusColor(item.status)}
+                        sx={{ fontWeight: 500 }}
+                      />
+                    </TableCell>
+                    <TableCell>{formatDate(item.tanggal)}</TableCell>
+                    <TableCell>
+                      <Tooltip title={item.cvUrl ? 'Buka CV' : 'CV belum tersedia'}>
+                        <span>
+                          <IconButton
+                            size="small"
+                            disabled={!item.cvUrl}
+                            onClick={() => window.open(item.cvUrl, '_blank', 'noopener,noreferrer')}
+                          >
+                            <DocumentIcon fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={9} sx={{ py: 0, borderBottom: expandedRows.includes(item.id) ? undefined : 'none' }}>
+                      <Collapse in={expandedRows.includes(item.id)} timeout="auto" unmountOnExit>
+                        <Box sx={{ py: 2, px: 3, bgcolor: 'action.hover', borderRadius: 1, my: 1 }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                            Detail Lamaran
+                          </Typography>
+                          <Box
+                            sx={{
+                              display: 'grid',
+                              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+                              gap: 2,
+                            }}
+                          >
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Judul Pengumuman
+                              </Typography>
+                              <Typography variant="body2">{item.judulPengumuman}</Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Bidang Industri
+                              </Typography>
+                              <Typography variant="body2">{item.bidangIndustri}</Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Tahun Lulus
+                              </Typography>
+                              <Typography variant="body2">{item.tahunLulus}</Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Lamaran Dibuat
+                              </Typography>
+                              <Typography variant="body2">{formatDate(item.tanggal)}</Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Tanggal Diterima
+                              </Typography>
+                              <Typography variant="body2">{formatDate(item.hiredAt)}</Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Application ID
+                              </Typography>
+                              <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
+                                {item.id}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Box>
+                      </Collapse>
+                    </TableCell>
+                  </TableRow>
+                </Fragment>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -670,57 +595,6 @@ export function LamaranPage() {
         </Stack>
       </Box>
 
-      <Menu
-        anchorEl={actionMenuAnchorEl}
-        open={Boolean(actionMenuAnchorEl)}
-        onClose={() => {
-          setActionMenuAnchorEl(null);
-          setActionMenuLowonganId(null);
-        }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        PaperProps={{ sx: { minWidth: 160, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' } }}
-      >
-        <MenuItem onClick={handleOpenApplyDialog}>
-          <ApplyIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
-          Lamar
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            if (actionMenuLowonganId) handleExpandRow(actionMenuLowonganId);
-            setActionMenuAnchorEl(null);
-            setActionMenuLowonganId(null);
-          }}
-        >
-          <ViewIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
-          Lihat Detail
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            setActionMenuAnchorEl(null);
-            setActionMenuLowonganId(null);
-          }}
-        >
-          <EditIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
-          Edit
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          onClick={() => {
-            if (actionMenuLowonganId) {
-              setSelectedIds([actionMenuLowonganId]);
-              setDeleteDialogOpen(true);
-            }
-            setActionMenuAnchorEl(null);
-            setActionMenuLowonganId(null);
-          }}
-          sx={{ color: 'error.main' }}
-        >
-          <DeleteIcon fontSize="small" sx={{ mr: 1.5 }} />
-          Hapus
-        </MenuItem>
-      </Menu>
-
       <Popover
         open={Boolean(filterAnchorEl)}
         anchorEl={filterAnchorEl}
@@ -730,30 +604,34 @@ export function LamaranPage() {
         PaperProps={{ sx: { p: 2, minWidth: 260, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' } }}
       >
         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-          Filter Lowongan
+          Filter Lamaran
         </Typography>
         <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-          <InputLabel>Kategori Bidang</InputLabel>
+          <InputLabel>Status</InputLabel>
           <Select
-            value={filterKategori}
-            onChange={(event) => setFilterKategori(event.target.value)}
-            label="Kategori Bidang"
+            value={filterStatus}
+            onChange={(event) => setFilterStatus(event.target.value as ApplicationStatus | 'all')}
+            label="Status"
           >
-            <MenuItem value="all">Semua Kategori</MenuItem>
-            {kategoriOptions.map((kategori) => (
-              <MenuItem key={kategori} value={kategori}>
-                {kategori}
+            <MenuItem value="all">Semua Status</MenuItem>
+            {statusOptions.map((status) => (
+              <MenuItem key={status} value={status}>
+                {statusLabels[status]}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
         <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-          <InputLabel>Status</InputLabel>
-          <Select value={filterStatus} onChange={(event) => setFilterStatus(event.target.value)} label="Status">
-            <MenuItem value="all">Semua Status</MenuItem>
-            {statusOptions.map((status) => (
-              <MenuItem key={status} value={status}>
-                {status}
+          <InputLabel>Jurusan</InputLabel>
+          <Select
+            value={filterJurusan}
+            onChange={(event) => setFilterJurusan(event.target.value)}
+            label="Jurusan"
+          >
+            <MenuItem value="all">Semua Jurusan</MenuItem>
+            {jurusanOptions.map((jurusan) => (
+              <MenuItem key={jurusan} value={jurusan}>
+                {jurusan}
               </MenuItem>
             ))}
           </Select>
@@ -772,49 +650,6 @@ export function LamaranPage() {
           </Button>
         </Box>
       </Popover>
-
-      <DialogCreateLowongan
-        open={addDialogOpen}
-        methods={methods}
-        kategoriOptions={kategoriOptions}
-        statusOptions={statusOptions}
-        onClose={() => {
-          setAddDialogOpen(false);
-          methods.reset();
-        }}
-        onSubmit={handleAddLowongan}
-      />
-
-      <DialogCreateLamaran
-        open={applyDialogOpen}
-        methods={lamaranMethods}
-        lowongan={selectedLowonganForApply}
-        onClose={handleCloseApplyDialog}
-        onSubmit={handleSubmitLamaran}
-      />
-
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        maxWidth="xs"
-        fullWidth
-        PaperProps={{ sx: { borderRadius: 3 } }}
-      >
-        <DialogTitle sx={{ fontWeight: 600 }}>Konfirmasi Hapus</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Yakin ingin menghapus {selectedIds.length} lowongan yang dipilih?
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setDeleteDialogOpen(false)} color="inherit">
-            Cancel
-          </Button>
-          <Button onClick={confirmDelete} variant="contained" color="error">
-            Hapus
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }

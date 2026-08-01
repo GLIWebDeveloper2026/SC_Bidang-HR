@@ -46,6 +46,45 @@ export interface Recruitment {
   positions: RecruitmentPosition[];
 }
 
+export type ApplicationStatus = 'IN_PROGRESS' | 'HIRED' | 'REJECTED';
+
+export interface ApplicationProfile {
+  nama: string | null;
+  email: string | null;
+}
+
+export interface ApplicationMahasiswa {
+  uid: string;
+  nim: string | null;
+  jurusan: string | null;
+  tahun_lulus?: number | string | null;
+  profiles: ApplicationProfile | null;
+}
+
+export interface ApplicationPosition {
+  uid: string;
+  posisi: string | null;
+  bidang_industri?: string | null;
+  recruitment: {
+    judul_pengumuman: string | null;
+    perusahaan: {
+      nama_perusahaan: string | null;
+    } | null;
+  } | null;
+}
+
+export interface Application {
+  uid: string;
+  position_id?: string | null;
+  mahasiswa_id?: string | null;
+  snapshot_cv_url: string | null;
+  status: ApplicationStatus;
+  hired_at: string | null;
+  created_at?: string | null;
+  mahasiswa: ApplicationMahasiswa | null;
+  position: ApplicationPosition | null;
+}
+
 export interface CreateCompanyJobPayload {
   judul_pengumuman: string;
   deskripsi?: string;
@@ -86,6 +125,7 @@ export const API_ENDPOINTS = {
   profileMe: '/v1/profiles/me',
   profileUpdate: '/v1/profiles/update',
   recruitments: '/v1/recruitments',
+  applications: '/v1/applications',
 } as const;
 
 export async function getCompanies() {
@@ -103,6 +143,11 @@ export async function updateCompany(id: string, payload: UpdateCompanyPayload) {
 
 export async function getRecruitments() {
   const { data } = await apiClient.get<ApiResponse<Recruitment[]>>(API_ENDPOINTS.recruitments);
+  return data.data;
+}
+
+export async function getApplications() {
+  const { data } = await apiClient.get<ApiResponse<Application[]>>(API_ENDPOINTS.applications);
   return data.data;
 }
 
