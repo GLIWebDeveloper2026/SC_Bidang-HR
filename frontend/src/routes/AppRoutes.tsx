@@ -1,0 +1,31 @@
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AppLayout } from '@/components/layout';
+import { ProtectedRoute } from './ProtectedRoute';
+import { LoginPage, DashboardPage, NotFoundPage, AccountPage, UserPage, BillingPage } from '@/pages';
+
+export function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public routes */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Protected routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          {/* Account page */}
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/user" element={<UserPage />} />
+          <Route path="/users/:id" element={<DashboardPage />} />
+          <Route path="/billing" element={<BillingPage />} />
+          <Route path="/blog" element={<DashboardPage />} />
+          <Route path="/settings" element={<DashboardPage />} />
+        </Route>
+      </Route>
+
+      {/* 404 */}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}
