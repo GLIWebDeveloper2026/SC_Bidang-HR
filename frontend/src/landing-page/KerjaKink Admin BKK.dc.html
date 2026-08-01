@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"><style>body{margin:0;background:#F5F2FA;font-family:Poppins,system-ui,sans-serif;color:#1B1B1F;-webkit-font-smoothing:antialiased}*{box-sizing:border-box}a{color:#606BDF;text-decoration:none}a:hover{color:#4A54B3}input,button,select{font-family:inherit}input:focus,select:focus{outline:none;border-color:#606BDF}:focus-visible{outline:2px solid #606BDF;outline-offset:2px}table{border-collapse:collapse;width:100%}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#DFDBE8;border-radius:4px}</style></helmet>
+
+<header style="background:#fff;border-bottom:1px solid #DFDBE8;position:sticky;top:0;z-index:20">
+<div style="max-width:1440px;margin:0 auto;padding:12px clamp(14px,2.5vw,28px);display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+<div style="display:flex;align-items:center;gap:10px;margin-right:auto">
+<svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="display:block;flex:0 0 auto" aria-hidden="true"><path d="M6 3.5v23" stroke="#1B1B1F" stroke-width="4.5"></path><path d="M7.6 15.4 23.6 4.2" stroke="#606BDF" stroke-width="4.5"></path><path d="M7.6 15.4 23.6 26.6" stroke="#1B1B1F" stroke-width="4.5"></path></svg>
+<div style="margin-left:-13px">
+<div style="font-size:15px;line-height:1.2"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">K</span><span style="font-weight:700">erja</span><span style="font-weight:400">Kink</span><span style="font-weight:500;color:#6B6B6F"> · Konsol Admin BKK</span></div>
+<div style="font-size:11.5px;color:#9A9AA1">Bursa Kerja Khusus · Politeknik Nusantara</div>
+</div>
+</div>
+<div style="position:relative;flex:1 1 220px;max-width:320px;min-width:0">
+<input type="text" value="{{ globalQuery }}" onChange="{{ onGlobalQuery }}" placeholder="Cari perusahaan, mahasiswa, lowongan…" style="width:100%;border:1px solid #DFDBE8;background:#F5F2FA;border-radius:6px;padding:9px 12px 9px 34px;font-size:13px"/>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9A9AA1" stroke-width="2" stroke-linecap="round" style="position:absolute;left:11px;top:10px"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4.3-4.3"></path></svg>
+</div>
+<div onClick="{{ toggleNotif }}" style="position:relative;width:34px;height:34px;flex:0 0 auto;border:1px solid #DFDBE8;border-radius:6px;display:grid;place-items:center;cursor:pointer;background:#fff" style-hover="border-color:#606BDF">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B6B6F" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+<span style="position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;background:#FF4D4F;color:#fff;font-size:10.5px;font-weight:600;border-radius:9px;display:grid;place-items:center;padding:0 4px">{{ pendingCount }}</span>
+</div>
+<div style="display:flex;align-items:center;gap:9px">
+<span style="font-size:11.5px;font-weight:500;color:#CF1322;background:#FFF1F0;border:1px solid #FFA39E;padding:5px 10px;border-radius:5px">Master Admin</span>
+<div style="width:32px;height:32px;border-radius:50%;background:#EDEDFB;color:#4A54B3;display:grid;place-items:center;font-size:12.5px;font-weight:600">HB</div>
+</div>
+</div>
+<sc-if value="{{ notifOpen }}">
+<div style="border-top:1px solid #DFDBE8;background:#F5F2FA">
+<div style="max-width:1440px;margin:0 auto;padding:12px clamp(14px,2.5vw,28px);display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ notifs }}" as="n" hint-placeholder-count="3">
+<div style="background:#fff;border:1px solid #DFDBE8;border-left:3px solid {{ n.accent }};border-radius:6px;padding:11px 13px">
+<div style="font-size:13px;font-weight:500">{{ n.title }}</div>
+<div style="font-size:11.5px;color:#9A9AA1;margin-top:2px">{{ n.time }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</header>
+
+<div style="max-width:1440px;margin:0 auto;padding:clamp(16px,2.5vw,28px) clamp(14px,2.5vw,28px) 48px;display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap">
+
+<aside style="flex:1 1 210px;max-width:250px;min-width:190px;position:sticky;top:78px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:8px;margin-bottom:14px">
+<sc-for list="{{ menu }}" as="m" hint-placeholder-count="6">
+<div onClick="{{ m.pick }}" style="display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:6px;cursor:pointer;background:{{ m.bg }};color:{{ m.fg }};font-size:13px;font-weight:{{ m.weight }};margin-bottom:2px" style-hover="background:#EDEDFB;color:#4A54B3">
+<span style="width:6px;height:6px;border-radius:50%;background:{{ m.dot }};flex:0 0 auto"></span>
+<span style="flex:1">{{ m.name }}</span>
+<sc-if value="{{ m.count }}"><span style="font-size:11px;font-weight:600;background:{{ m.badgeBg }};color:{{ m.badgeFg }};padding:2px 7px;border-radius:10px">{{ m.count }}</span></sc-if>
+</div>
+</sc-for>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:16px">
+<div style="font-size:12px;font-weight:600;color:#6B6B6F;margin-bottom:12px">Kesehatan portal</div>
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#9A9AA1">Lowongan aktif</span><span style="font-weight:600">1.284</span></div>
+<div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#9A9AA1">Kadaluarsa (tersembunyi)</span><span style="font-weight:600">96</span></div>
+<div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#9A9AA1">Laporan penipuan</span><span style="font-weight:600;color:#CF1322">3</span></div>
+</div>
+<div style="height:1px;background:#DFDBE8;margin:14px 0"></div>
+<button onClick="{{ downloadReport }}" style="width:100%;background:#606BDF;color:#fff;border:none;padding:10px;border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Unduh laporan akreditasi</button>
+</div>
+</aside>
+
+<main style="flex:999 1 620px;min-width:0">
+
+<sc-if value="{{ tabRingkasan }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px">
+<div>
+<h1 style="font-size:clamp(21px,2.2vw,28px);font-weight:600;letter-spacing:-0.6px;margin:0 0 5px">Ringkasan BKK</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0">Periode Agustus 2026 · data diperbarui otomatis dari log status lamaran.</p>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<sc-for list="{{ periods }}" as="p" hint-placeholder-count="3">
+<button onClick="{{ p.pick }}" style="background:{{ p.bg }};color:{{ p.fg }};border:1px solid {{ p.bd }};padding:7px 13px;border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer">{{ p.name }}</button>
+</sc-for>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:13px;margin-bottom:16px">
+<sc-for list="{{ kpis }}" as="k" hint-placeholder-count="6">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:17px">
+<div style="font-size:11.5px;color:#9A9AA1;margin-bottom:8px">{{ k.label }}</div>
+<div style="font-size:25px;font-weight:600;letter-spacing:-0.6px;line-height:1.1">{{ k.value }}</div>
+<div style="font-size:11.5px;font-weight:500;color:{{ k.deltaFg }};background:{{ k.deltaBg }};display:inline-block;padding:3px 8px;border-radius:5px;margin-top:9px">{{ k.delta }}</div>
+</div>
+</sc-for>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;margin-bottom:16px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px">
+<div><div style="font-size:14px;font-weight:600">Serapan alumni per bidang</div><div style="font-size:11.5px;color:#9A9AA1;margin-top:2px">Angkatan 2024 – 2026</div></div>
+<span style="font-size:11.5px;font-weight:500;color:#237804;background:#F6FFED;border:1px solid #B7EB8F;padding:3px 9px;border-radius:5px">Otomatis</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{ bidang }}" as="b" hint-placeholder-count="5">
+<div>
+<div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span>{{ b.name }}</span><span style="color:#9A9AA1">{{ b.label }}</span></div>
+<div style="height:9px;background:#F5F2FA;border:1px solid #DFDBE8;border-radius:5px;overflow:hidden"><div style="height:100%;background:#606BDF;width:{{ b.pct }}"></div></div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<div style="font-size:14px;font-weight:600;margin-bottom:4px">Lamaran per bulan</div>
+<div style="font-size:11.5px;color:#9A9AA1;margin-bottom:18px">Terkirim vs diterima</div>
+<div style="display:flex;align-items:flex-end;gap:clamp(6px,1.6vw,16px);height:150px">
+<sc-for list="{{ months }}" as="m" hint-placeholder-count="6">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px">
+<div style="width:100%;display:flex;gap:3px;align-items:flex-end;height:120px">
+<div style="flex:1;background:#8B93E8;height:{{ m.h1 }};border-radius:3px 3px 0 0"></div>
+<div style="flex:1;background:#606BDF;height:{{ m.h2 }};border-radius:3px 3px 0 0"></div>
+</div>
+<span style="font-size:10.5px;color:#9A9AA1">{{ m.name }}</span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:16px;margin-top:14px;font-size:11.5px;color:#6B6B6F">
+<span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:#8B93E8;border-radius:2px"></span>Terkirim</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:#606BDF;border-radius:2px"></span>Diterima</span>
+</div>
+</div>
+</div>
+<sc-if value="{{ showActivity }}" hint-placeholder-val="{{ true }}">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="padding:15px 18px;border-bottom:1px solid #DFDBE8;background:#F5F2FA;font-size:13.5px;font-weight:600">Aktivitas terbaru</div>
+<sc-for list="{{ activity }}" as="a" hint-placeholder-count="5">
+<div style="padding:13px 18px;border-bottom:1px solid #DFDBE8;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+<span style="width:8px;height:8px;border-radius:50%;background:{{ a.dot }};flex:0 0 auto"></span>
+<span style="font-size:13px;flex:1 1 220px;min-width:0">{{ a.text }}</span>
+<span style="font-size:11.5px;color:#9A9AA1">{{ a.time }}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ tabPerusahaan }}">
+<div style="margin-bottom:16px">
+<h1 style="font-size:clamp(21px,2.2vw,28px);font-weight:600;letter-spacing:-0.6px;margin:0 0 5px">Data perusahaan</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0">{{ companyTotal }} perusahaan terdaftar. Sunting profil, cabut verifikasi, atau masukkan ke daftar hitam.</p>
+</div>
+<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px">
+<input type="text" value="{{ coQuery }}" onChange="{{ onCoQuery }}" placeholder="Cari nama perusahaan…" style="flex:1 1 220px;min-width:0;border:1px solid #DFDBE8;background:#fff;border-radius:6px;padding:10px 12px;font-size:13px"/>
+<sc-for list="{{ coFilters }}" as="f" hint-placeholder-count="4">
+<button onClick="{{ f.pick }}" style="background:{{ f.bg }};color:{{ f.fg }};border:1px solid {{ f.bd }};padding:9px 14px;border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer">{{ f.name }}</button>
+</sc-for>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden">
+<div style="overflow-x:auto">
+<table>
+<thead><tr style="background:#F5F2FA;border-bottom:1px solid #DFDBE8">
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Perusahaan</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Bidang</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Lowongan</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Pelamar</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Diterima</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Status</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Aksi</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{ companies }}" as="c" hint-placeholder-count="6">
+<tr style="border-bottom:1px solid #DFDBE8">
+<td style="padding:13px 16px">
+<div style="display:flex;align-items:center;gap:11px">
+<div style="width:34px;height:34px;flex:0 0 auto;background:#EDEDFB;color:#4A54B3;border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:600">{{ c.initial }}</div>
+<div><div style="font-size:13.5px;font-weight:500;white-space:nowrap">{{ c.name }}</div><div style="font-size:11.5px;color:#9A9AA1">{{ c.location }}</div></div>
+</div>
+</td>
+<td style="padding:13px 16px;font-size:12.5px;color:#6B6B6F;white-space:nowrap">{{ c.bidang }}</td>
+<td style="padding:13px 16px;font-size:13px;font-weight:500">{{ c.lowongan }}</td>
+<td style="padding:13px 16px;font-size:13px;font-weight:500">{{ c.pelamar }}</td>
+<td style="padding:13px 16px;font-size:13px;font-weight:500;color:#237804">{{ c.diterima }}</td>
+<td style="padding:13px 16px"><span style="font-size:11.5px;font-weight:500;color:{{ c.fg }};background:{{ c.bg }};border:1px solid {{ c.bd }};padding:4px 10px;border-radius:5px;white-space:nowrap">{{ c.status }}</span></td>
+<td style="padding:13px 16px">
+<div style="display:flex;gap:6px">
+<button onClick="{{ c.edit }}" style="background:#fff;color:#4A54B3;border:1px solid #606BDF;padding:6px 11px;border-radius:5px;font-size:11.5px;font-weight:500;cursor:pointer;white-space:nowrap" style-hover="background:#EDEDFB">Sunting</button>
+<button onClick="{{ c.blacklist }}" style="background:#FFF1F0;color:#CF1322;border:1px solid #FFA39E;padding:6px 11px;border-radius:5px;font-size:11.5px;font-weight:500;cursor:pointer;white-space:nowrap" style-hover="background:#FFCCC7">Blacklist</button>
+</div>
+</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<sc-if value="{{ noCompanies }}"><div style="padding:38px 18px;text-align:center;font-size:13px;color:#9A9AA1">Tidak ada perusahaan yang cocok dengan filter ini.</div></sc-if>
+<div style="padding:13px 16px;background:#F5F2FA;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:#9A9AA1">
+<span>Menampilkan {{ companyShown }} dari {{ companyTotal }} perusahaan</span>
+<span>Data pelamar tidak menampilkan identitas tanpa persetujuan mahasiswa</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabMahasiswa }}">
+<div style="margin-bottom:16px">
+<h1 style="font-size:clamp(21px,2.2vw,28px);font-weight:600;letter-spacing:-0.6px;margin:0 0 5px">Mahasiswa &amp; pelamar</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0">Rekap pelamar aktif per program studi, lengkap dengan status kerja untuk tracer study.</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:13px;margin-bottom:16px">
+<sc-for list="{{ studentKpis }}" as="k" hint-placeholder-count="4">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:17px">
+<div style="font-size:11.5px;color:#9A9AA1;margin-bottom:8px">{{ k.label }}</div>
+<div style="font-size:25px;font-weight:600;letter-spacing:-0.6px">{{ k.value }}</div>
+<div style="font-size:11.5px;color:#9A9AA1;margin-top:6px">{{ k.note }}</div>
+</div>
+</sc-for>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<div style="font-size:14px;font-weight:600;margin-bottom:16px">Pelamar per program studi</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{ prodi }}" as="p" hint-placeholder-count="5">
+<div>
+<div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span>{{ p.name }}</span><span style="color:#9A9AA1">{{ p.count }} pelamar</span></div>
+<div style="height:9px;background:#F5F2FA;border:1px solid #DFDBE8;border-radius:5px;overflow:hidden"><div style="height:100%;background:#606BDF;width:{{ p.pct }}"></div></div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<div style="font-size:14px;font-weight:600;margin-bottom:16px">Status kerja alumni</div>
+<div style="display:flex;flex-direction:column;gap:11px">
+<sc-for list="{{ statusKerja }}" as="s" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:11px;border:1px solid #DFDBE8;border-radius:8px;padding:12px;background:#F5F2FA">
+<span style="width:10px;height:10px;border-radius:50%;background:{{ s.dot }};flex:0 0 auto"></span>
+<span style="font-size:13px;flex:1">{{ s.name }}</span>
+<span style="font-size:13.5px;font-weight:600">{{ s.value }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden;margin-top:16px">
+<div style="padding:15px 18px;border-bottom:1px solid #DFDBE8;background:#F5F2FA;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+<span style="font-size:13.5px;font-weight:600">Pelamar terbaru</span>
+<button onClick="{{ exportStudents }}" style="background:#fff;color:#4A54B3;border:1px solid #606BDF;padding:7px 13px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer" style-hover="background:#EDEDFB">Ekspor CSV</button>
+</div>
+<div style="overflow-x:auto">
+<table>
+<thead><tr style="background:#F5F2FA;border-bottom:1px solid #DFDBE8">
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Mahasiswa</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Program studi</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Angkatan</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Lamaran</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Status</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{ students }}" as="st" hint-placeholder-count="6">
+<tr style="border-bottom:1px solid #DFDBE8">
+<td style="padding:13px 16px">
+<div style="display:flex;align-items:center;gap:11px">
+<div style="width:32px;height:32px;flex:0 0 auto;border-radius:50%;background:#EDEDFB;color:#4A54B3;display:grid;place-items:center;font-size:11.5px;font-weight:600">{{ st.initial }}</div>
+<div><div style="font-size:13.5px;font-weight:500;white-space:nowrap">{{ st.name }}</div><div style="font-size:11.5px;color:#9A9AA1">{{ st.nim }}</div></div>
+</div>
+</td>
+<td style="padding:13px 16px;font-size:12.5px;color:#6B6B6F;white-space:nowrap">{{ st.prodi }}</td>
+<td style="padding:13px 16px;font-size:13px">{{ st.angkatan }}</td>
+<td style="padding:13px 16px;font-size:13px;font-weight:500">{{ st.lamaran }}</td>
+<td style="padding:13px 16px"><span style="font-size:11.5px;font-weight:500;color:{{ st.fg }};background:{{ st.bg }};border:1px solid {{ st.bd }};padding:4px 10px;border-radius:5px;white-space:nowrap">{{ st.status }}</span></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabVerifikasi }}">
+<div style="margin-bottom:16px">
+<h1 style="font-size:clamp(21px,2.2vw,28px);font-weight:600;letter-spacing:-0.6px;margin:0 0 5px">Antrean verifikasi</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0">{{ pendingCount }} perusahaan menunggu pemeriksaan dokumen. Perusahaan tidak bisa memasang lowongan sebelum Verified.</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">
+<sc-for list="{{ queue }}" as="q" hint-placeholder-count="3">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">
+<div style="width:40px;height:40px;flex:0 0 auto;background:#EDEDFB;color:#4A54B3;border-radius:8px;display:grid;place-items:center;font-size:13px;font-weight:600">{{ q.initial }}</div>
+<div style="flex:1;min-width:0">
+<div style="font-size:14.5px;font-weight:600">{{ q.name }}</div>
+<div style="font-size:12px;color:#9A9AA1">{{ q.bidang }} · diajukan {{ q.date }}</div>
+</div>
+<span style="font-size:11.5px;font-weight:500;color:{{ q.fg }};background:{{ q.bg }};border:1px solid {{ q.bd }};padding:4px 10px;border-radius:5px">{{ q.status }}</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+<sc-for list="{{ q.docs }}" as="d" hint-placeholder-count="2">
+<div style="display:flex;align-items:center;gap:10px;border:1px solid #DFDBE8;border-radius:7px;padding:10px 12px;background:#F5F2FA">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A54B3" stroke-width="2" stroke-linecap="round" style="flex:0 0 auto"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
+<span style="font-size:12.5px;flex:1;min-width:0">{{ d.name }}</span>
+<span style="font-size:11.5px;color:#606BDF;cursor:pointer">Lihat</span>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ q.pending }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button onClick="{{ q.verify }}" style="background:#606BDF;color:#fff;border:none;padding:9px 15px;border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Verified</button>
+<button onClick="{{ q.reject }}" style="background:#fff;color:#6B6B6F;border:1px solid #DFDBE8;padding:9px 15px;border-radius:6px;font-size:12.5px;cursor:pointer" style-hover="background:#F5F2FA">Tolak</button>
+<button onClick="{{ q.blacklist }}" style="background:#FFF1F0;color:#CF1322;border:1px solid #FFA39E;padding:9px 15px;border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="background:#FFCCC7">Blacklist</button>
+</div>
+</sc-if>
+<sc-if value="{{ q.done }}">
+<div style="font-size:12px;color:#9A9AA1;border-top:1px solid #DFDBE8;padding-top:12px">Diproses oleh Master Admin · {{ q.status }}</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabTracer }}">
+<div style="margin-bottom:16px">
+<h1 style="font-size:clamp(21px,2.2vw,28px);font-weight:600;letter-spacing:-0.6px;margin:0 0 5px">Tracer study &amp; akreditasi</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0">Terisi otomatis setiap kali status lamaran berubah menjadi Diterima — tanggal lulus, tanggal melamar, tanggal diterima, bidang, dan gaji awal.</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:13px;margin-bottom:16px">
+<sc-for list="{{ tracerKpis }}" as="k" hint-placeholder-count="4">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:17px">
+<div style="font-size:11.5px;color:#9A9AA1;margin-bottom:8px">{{ k.label }}</div>
+<div style="font-size:24px;font-weight:600;letter-spacing:-0.5px">{{ k.value }}</div>
+<div style="font-size:11.5px;color:#9A9AA1;margin-top:6px">{{ k.note }}</div>
+</div>
+</sc-for>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;overflow:hidden;margin-bottom:16px">
+<div style="padding:15px 18px;border-bottom:1px solid #DFDBE8;background:#F5F2FA;font-size:13.5px;font-weight:600">Catatan penyerapan terbaru (riwayat_lamaran)</div>
+<div style="overflow-x:auto">
+<table>
+<thead><tr style="background:#F5F2FA;border-bottom:1px solid #DFDBE8">
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Alumni</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Bidang pekerjaan</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Tgl lulus</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Tgl diterima</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Waktu tunggu</th>
+<th style="text-align:left;font-size:11.5px;font-weight:600;color:#6B6B6F;padding:12px 16px;white-space:nowrap">Gaji awal</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{ tracerRows }}" as="r" hint-placeholder-count="5">
+<tr style="border-bottom:1px solid #DFDBE8">
+<td style="padding:13px 16px;font-size:13px;font-weight:500;white-space:nowrap">{{ r.name }}</td>
+<td style="padding:13px 16px;font-size:12.5px;color:#6B6B6F;white-space:nowrap">{{ r.bidang }}</td>
+<td style="padding:13px 16px;font-size:12.5px;color:#6B6B6F;white-space:nowrap">{{ r.lulus }}</td>
+<td style="padding:13px 16px;font-size:12.5px;color:#6B6B6F;white-space:nowrap">{{ r.diterima }}</td>
+<td style="padding:13px 16px;font-size:13px">{{ r.tunggu }}</td>
+<td style="padding:13px 16px;font-size:13px;font-weight:500">{{ r.gaji }}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</div>
+<div style="background:#EDEDFB;border-radius:10px;padding:20px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+<div style="max-width:60ch">
+<div style="font-size:15px;font-weight:600;color:#4A54B3;margin-bottom:5px">Laporan akreditasi 2 tahun</div>
+<div style="font-size:13px;color:#6B6B6F">Format siap unggah ke borang: satu baris per alumni dengan bidang pekerjaan, waktu tunggu, dan gaji awal.</div>
+</div>
+<button onClick="{{ downloadReport }}" style="background:#606BDF;color:#fff;border:none;padding:12px 20px;border-radius:6px;font-size:13.5px;font-weight:500;cursor:pointer" style-hover="background:#4A54B3">Unduh XLSX</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabPengaturan }}">
+<div style="margin-bottom:16px">
+<h1 style="font-size:clamp(21px,2.2vw,28px);font-weight:600;letter-spacing:-0.6px;margin:0 0 5px">Pengaturan master admin</h1>
+<p style="font-size:13.5px;color:#6B6B6F;margin:0">Kendali akses, aturan lowongan, dan integrasi kampus.</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px">
+<sc-for list="{{ settings }}" as="s" hint-placeholder-count="4">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<div style="display:flex;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+<div style="font-size:14.5px;font-weight:600">{{ s.name }}</div>
+<div onClick="{{ s.toggle }}" style="width:42px;height:24px;border-radius:12px;background:{{ s.trackBg }};flex:0 0 auto;cursor:pointer;padding:3px;display:flex;justify-content:{{ s.justify }}">
+<span style="width:18px;height:18px;border-radius:50%;background:#fff"></span>
+</div>
+</div>
+<div style="font-size:12.5px;color:#6B6B6F;line-height:1.6">{{ s.desc }}</div>
+</div>
+</sc-for>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px">
+<div style="font-size:14.5px;font-weight:600;margin-bottom:12px">Akun staf BKK</div>
+<div style="display:flex;flex-direction:column;gap:9px;margin-bottom:14px">
+<sc-for list="{{ staff }}" as="st" hint-placeholder-count="3">
+<div style="display:flex;gap:11px;align-items:center;border:1px solid #DFDBE8;border-radius:8px;padding:11px;background:#F5F2FA">
+<div style="width:30px;height:30px;flex:0 0 auto;border-radius:50%;background:#EDEDFB;color:#4A54B3;display:grid;place-items:center;font-size:11.5px;font-weight:600">{{ st.initial }}</div>
+<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">{{ st.name }}</div><div style="font-size:11.5px;color:#9A9AA1">{{ st.email }}</div></div>
+<span style="font-size:11.5px;font-weight:500;color:{{ st.fg }};background:{{ st.bg }};border:1px solid {{ st.bd }};padding:3px 9px;border-radius:5px;white-space:nowrap">{{ st.role }}</span>
+</div>
+</sc-for>
+</div>
+<button onClick="{{ inviteStaff }}" style="width:100%;background:#fff;color:#4A54B3;border:1px solid #606BDF;padding:10px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#EDEDFB">Undang staf baru</button>
+</div>
+</div>
+</sc-if>
+
+</main>
+</div>
+
+<sc-if value="{{ toast }}">
+<div style="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#1B1B1F;color:#fff;padding:12px 20px;border-radius:8px;font-size:12.5px;font-weight:500;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.24);max-width:90vw">{{ toast }}</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:980},&quot;showActivity&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Konten&quot;},&quot;studentRows&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:6,&quot;min&quot;:3,&quot;max&quot;:6,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Konten&quot;}}">
+const COMPANIES = [
+  { id: "c1", initial: "ND", name: "PT Nusantara Digital", location: "Jakarta Selatan", bidang: "Teknologi Informasi", lowongan: 6, pelamar: 148, diterima: 21, state: "verified" },
+  { id: "c2", initial: "BS", name: "Bank Sentra Amanah", location: "Jakarta Pusat", bidang: "Keuangan", lowongan: 4, pelamar: 212, diterima: 18, state: "verified" },
+  { id: "c3", initial: "KL", name: "Kreasi Loka Studio", location: "Bandung", bidang: "Desain", lowongan: 2, pelamar: 64, diterima: 7, state: "verified" },
+  { id: "c4", initial: "AK", name: "PT Arta Kencana", location: "Semarang", bidang: "Manufaktur", lowongan: 0, pelamar: 0, diterima: 0, state: "pending" },
+  { id: "c5", initial: "LR", name: "Studio Lintas Rupa", location: "Yogyakarta", bidang: "Desain", lowongan: 0, pelamar: 0, diterima: 0, state: "pending" },
+  { id: "c6", initial: "JT", name: "Jarindo Telekom", location: "Surabaya", bidang: "Telekomunikasi", lowongan: 3, pelamar: 96, diterima: 11, state: "verified" },
+  { id: "c7", initial: "MA", name: "CV Mitra Abadi", location: "Semarang", bidang: "Keuangan", lowongan: 1, pelamar: 38, diterima: 4, state: "verified" },
+  { id: "c8", initial: "CU", name: "CV Cepat Untung", location: "Bekasi", bidang: "Perdagangan", lowongan: 0, pelamar: 0, diterima: 0, state: "blacklist" },
+  { id: "c9", initial: "TS", name: "PT Terang Sejahtera", location: "Malang", bidang: "Manufaktur", lowongan: 0, pelamar: 12, diterima: 0, state: "ditolak" }
+];
+
+const CO_STATE = {
+  verified: { status: "Verified", bg: "#F6FFED", fg: "#237804", bd: "#B7EB8F" },
+  pending: { status: "Pending", bg: "#FFFBE6", fg: "#D48806", bd: "#FFE58F" },
+  ditolak: { status: "Ditolak", bg: "#F5F2FA", fg: "#6B6B6F", bd: "#DFDBE8" },
+  blacklist: { status: "Blacklist", bg: "#FFF1F0", fg: "#CF1322", bd: "#FFA39E" }
+};
+
+const STUDENTS = [
+  { initial: "RA", name: "Rani Anggraini", nim: "21.01.0412", prodi: "Teknik Informatika", angkatan: 2026, lamaran: 3, state: "proses" },
+  { initial: "AF", name: "Adi Firmansyah", nim: "20.01.0233", prodi: "Teknik Informatika", angkatan: 2025, lamaran: 5, state: "diterima" },
+  { initial: "LM", name: "Laras Maharani", nim: "21.02.0119", prodi: "Sistem Informasi", angkatan: 2026, lamaran: 2, state: "proses" },
+  { initial: "BP", name: "Bayu Prakoso", nim: "19.03.0087", prodi: "Teknik Komputer", angkatan: 2024, lamaran: 7, state: "diterima" },
+  { initial: "SN", name: "Sinta Nuraini", nim: "21.01.0508", prodi: "Teknik Informatika", angkatan: 2026, lamaran: 1, state: "menunggu" },
+  { initial: "DP", name: "Dwi Purnama", nim: "20.04.0164", prodi: "Akuntansi", angkatan: 2025, lamaran: 4, state: "belum" }
+];
+
+const ST_STATE = {
+  diterima: { status: "Sudah bekerja", bg: "#F6FFED", fg: "#237804", bd: "#B7EB8F" },
+  proses: { status: "Dalam seleksi", bg: "#EDEDFB", fg: "#4A54B3", bd: "#8B93E8" },
+  menunggu: { status: "Menunggu HRD", bg: "#FFFBE6", fg: "#D48806", bd: "#FFE58F" },
+  belum: { status: "Belum bekerja", bg: "#F5F2FA", fg: "#6B6B6F", bd: "#DFDBE8" }
+};
+
+const QUEUE = [
+  { id: "q1", initial: "AK", name: "PT Arta Kencana", bidang: "Manufaktur", date: "29 Jul 2026", docs: [{ name: "NIB-ArtaKencana.pdf" }, { name: "Akta-Pendirian.pdf" }] },
+  { id: "q2", initial: "LR", name: "Studio Lintas Rupa", bidang: "Desain", date: "30 Jul 2026", docs: [{ name: "NIB-LintasRupa.pdf" }] },
+  { id: "q3", initial: "SG", name: "PT Sigma Teknologi", bidang: "Teknologi Informasi", date: "31 Jul 2026", docs: [{ name: "NIB-Sigma.pdf" }, { name: "Surat-Domisili.pdf" }, { name: "NPWP.pdf" }] }
+];
+
+class Component extends DCLogic {
+  state = {
+    tab: "ringkasan", period: "30 hari", globalQuery: "", coQuery: "", coFilter: "Semua",
+    notifOpen: false, toast: "",
+    companies: COMPANIES.slice(),
+    queue: QUEUE.map(q => Object.assign({}, q, { state: "pending" })),
+    settings: [
+      { id: "s1", name: "Wajib verifikasi sebelum posting", desc: "Perusahaan baru tidak dapat memasang lowongan sebelum dokumen disetujui Admin BKK.", on: true },
+      { id: "s2", name: "Sembunyikan lowongan kadaluarsa", desc: "Lowongan lewat batas waktu atau kuota penuh otomatis hilang dari publik; lamaran tersisa masuk talent pool.", on: true },
+      { id: "s3", name: "Sembunyikan identitas pelamar", desc: "Nama dan NIM mahasiswa hanya terlihat HRD setelah lamaran masuk tahap wawancara.", on: false },
+      { id: "s4", name: "Sinkronisasi data akademik", desc: "Tarik tanggal lulus dan program studi dari SIAKAD kampus setiap malam.", on: true }
+    ]
+  };
+
+  toast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: "" }), 2600);
+  }
+
+  setCo(id, st) {
+    this.setState(s => ({ companies: s.companies.map(c => c.id === id ? Object.assign({}, c, { state: st }) : c) }));
+  }
+
+  decide(id, st) {
+    const labels = { verified: "Verified", ditolak: "Ditolak", blacklist: "Blacklist" };
+    this.setState(s => ({ queue: s.queue.map(q => q.id === id ? Object.assign({}, q, { state: st }) : q) }));
+    this.toast("Perusahaan ditandai " + labels[st]);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const pendingQueue = s.queue.filter(q => q.state === "pending").length;
+    const q = s.coQuery.trim().toLowerCase();
+    const gq = s.globalQuery.trim().toLowerCase();
+    const filteredCo = s.companies.filter(c => {
+      if (q && (c.name + " " + c.bidang + " " + c.location).toLowerCase().indexOf(q) < 0) return false;
+      if (gq && (c.name + " " + c.bidang).toLowerCase().indexOf(gq) < 0) return false;
+      if (s.coFilter === "Semua") return true;
+      if (s.coFilter === "Terverifikasi") return c.state === "verified";
+      if (s.coFilter === "Pending") return c.state === "pending";
+      return c.state === "blacklist" || c.state === "ditolak";
+    });
+    const menuDef = [
+      { id: "ringkasan", name: "Ringkasan" },
+      { id: "perusahaan", name: "Data Perusahaan", count: s.companies.length },
+      { id: "mahasiswa", name: "Mahasiswa & Pelamar", count: 1842 },
+      { id: "verifikasi", name: "Antrean Verifikasi", count: pendingQueue, urgent: true },
+      { id: "tracer", name: "Tracer Study" },
+      { id: "pengaturan", name: "Pengaturan" }
+    ];
+
+    return {
+      globalQuery: s.globalQuery,
+      onGlobalQuery: e => this.setState({ globalQuery: e.target.value, tab: e.target.value ? "perusahaan" : s.tab }),
+      pendingCount: pendingQueue,
+      notifOpen: s.notifOpen,
+      toggleNotif: () => this.setState({ notifOpen: !s.notifOpen }),
+      notifs: [
+        { title: "PT Sigma Teknologi mengajukan verifikasi (3 dokumen)", time: "12 menit lalu", accent: "#D48806" },
+        { title: "Adi Firmansyah diterima di PT Nusantara Digital · tracer study tercatat", time: "1 jam lalu", accent: "#237804" },
+        { title: "3 laporan lowongan tidak wajar menunggu peninjauan", time: "Hari ini, 08:20", accent: "#CF1322" }
+      ],
+      tabRingkasan: s.tab === "ringkasan", tabPerusahaan: s.tab === "perusahaan",
+      tabMahasiswa: s.tab === "mahasiswa", tabVerifikasi: s.tab === "verifikasi",
+      tabTracer: s.tab === "tracer", tabPengaturan: s.tab === "pengaturan",
+      menu: menuDef.map(m => {
+        const on = s.tab === m.id;
+        return {
+          name: m.name, count: m.count, pick: () => this.setState({ tab: m.id, notifOpen: false }),
+          bg: on ? "#EDEDFB" : "transparent", fg: on ? "#4A54B3" : "#6B6B6F", weight: on ? "600" : "400",
+          dot: on ? "#606BDF" : "#DFDBE8",
+          badgeBg: m.urgent ? "#FFFBE6" : "#F5F2FA", badgeFg: m.urgent ? "#D48806" : "#9A9AA1"
+        };
+      }),
+      periods: ["7 hari", "30 hari", "1 tahun"].map(p => ({
+        name: p, pick: () => this.setState({ period: p }),
+        bg: s.period === p ? "#606BDF" : "#ffffff", fg: s.period === p ? "#ffffff" : "#6B6B6F", bd: s.period === p ? "#606BDF" : "#DFDBE8"
+      })),
+      kpis: [
+        { label: "Perusahaan terverifikasi", value: "312", delta: "+8 bulan ini", deltaBg: "#F6FFED", deltaFg: "#237804" },
+        { label: "Menunggu verifikasi", value: String(pendingQueue), delta: "Perlu tindakan", deltaBg: "#FFFBE6", deltaFg: "#D48806" },
+        { label: "Mahasiswa & alumni terdaftar", value: "1.842", delta: "+124 semester ini", deltaBg: "#EDEDFB", deltaFg: "#4A54B3" },
+        { label: "Lamaran terkirim", value: "4.126", delta: "+312 bulan ini", deltaBg: "#EDEDFB", deltaFg: "#4A54B3" },
+        { label: "Alumni terserap", value: "76%", delta: "Target borang 70%", deltaBg: "#F6FFED", deltaFg: "#237804" },
+        { label: "Laporan lowongan bermasalah", value: "3", delta: "Tinjau segera", deltaBg: "#FFF1F0", deltaFg: "#CF1322" }
+      ],
+      bidang: [
+        { name: "Teknologi Informasi", label: "38%", pct: "38%" },
+        { name: "Keuangan & Perbankan", label: "22%", pct: "22%" },
+        { name: "Manufaktur", label: "16%", pct: "16%" },
+        { name: "Pendidikan", label: "13%", pct: "13%" },
+        { name: "Lainnya", label: "11%", pct: "11%" }
+      ],
+      months: [
+        { name: "Mar", h1: "58%", h2: "26%" }, { name: "Apr", h1: "70%", h2: "34%" },
+        { name: "Mei", h1: "62%", h2: "30%" }, { name: "Jun", h1: "86%", h2: "48%" },
+        { name: "Jul", h1: "100%", h2: "60%" }, { name: "Agu", h1: "44%", h2: "22%" }
+      ],
+      showActivity: this.props.showActivity ?? true,
+      activity: [
+        { text: "Verifikasi disetujui · Jarindo Telekom", time: "Hari ini, 09:12", dot: "#237804" },
+        { text: "CV Cepat Untung dimasukkan ke daftar hitam setelah 2 laporan", time: "Hari ini, 08:47", dot: "#CF1322" },
+        { text: "Laporan akreditasi 2024–2026 diunduh oleh Kepala BKK", time: "Kemarin, 16:05", dot: "#606BDF" },
+        { text: "Bank Sentra Amanah menambah 2 posisi pada lowongan Data Analyst", time: "Kemarin, 14:22", dot: "#9A9AA1" },
+        { text: "18 mahasiswa baru melengkapi profil dan mengunggah CV", time: "30 Jul 2026", dot: "#9A9AA1" }
+      ],
+      coQuery: s.coQuery,
+      onCoQuery: e => this.setState({ coQuery: e.target.value }),
+      coFilters: ["Semua", "Terverifikasi", "Pending", "Diblokir"].map(f => ({
+        name: f, pick: () => this.setState({ coFilter: f }),
+        bg: s.coFilter === f ? "#606BDF" : "#ffffff", fg: s.coFilter === f ? "#ffffff" : "#6B6B6F", bd: s.coFilter === f ? "#606BDF" : "#DFDBE8"
+      })),
+      companies: filteredCo.map(c => Object.assign({}, c, CO_STATE[c.state], {
+        edit: () => this.toast("Membuka editor profil " + c.name),
+        blacklist: () => { this.setCo(c.id, "blacklist"); this.toast(c.name + " dimasukkan ke daftar hitam"); }
+      })),
+      noCompanies: filteredCo.length === 0,
+      companyShown: filteredCo.length, companyTotal: s.companies.length,
+      studentKpis: [
+        { label: "Mahasiswa & alumni", value: "1.842", note: "Akun aktif terdaftar" },
+        { label: "Pelamar aktif", value: "684", note: "Punya lamaran berjalan" },
+        { label: "Sudah bekerja", value: "1.402", note: "76% dari total alumni" },
+        { label: "Rata-rata lamaran", value: "3,4", note: "Per mahasiswa per semester" }
+      ],
+      prodi: [
+        { name: "Teknik Informatika", count: 248, pct: "88%" },
+        { name: "Sistem Informasi", count: 176, pct: "62%" },
+        { name: "Akuntansi", count: 118, pct: "42%" },
+        { name: "Teknik Komputer", count: 92, pct: "33%" },
+        { name: "Administrasi Bisnis", count: 50, pct: "18%" }
+      ],
+      statusKerja: [
+        { name: "Sudah bekerja", value: "1.402", dot: "#237804" },
+        { name: "Dalam seleksi", value: "268", dot: "#606BDF" },
+        { name: "Menunggu HRD", value: "104", dot: "#D48806" },
+        { name: "Belum bekerja", value: "68", dot: "#9A9AA1" }
+      ],
+      students: STUDENTS.slice(0, this.props.studentRows ?? 6).map(st => Object.assign({}, st, ST_STATE[st.state])),
+      exportStudents: () => this.toast("pelamar-agustus-2026.csv sedang disiapkan"),
+      queue: s.queue.map(qq => Object.assign({}, qq, CO_STATE[qq.state], {
+        pending: qq.state === "pending", done: qq.state !== "pending",
+        verify: () => this.decide(qq.id, "verified"),
+        reject: () => this.decide(qq.id, "ditolak"),
+        blacklist: () => this.decide(qq.id, "blacklist")
+      })),
+      tracerKpis: [
+        { label: "Alumni terserap", value: "76%", note: "1.402 dari 1.842" },
+        { label: "Rata-rata waktu tunggu", value: "3,1 bln", note: "Dari tanggal lulus" },
+        { label: "Median gaji awal", value: "Rp5,4 jt", note: "Seluruh bidang" },
+        { label: "Catatan tercatat", value: "1.402", note: "Baris riwayat_lamaran" }
+      ],
+      tracerRows: [
+        { name: "Adi Firmansyah", bidang: "Teknologi Informasi", lulus: "10 Jul 2025", diterima: "2 Okt 2025", tunggu: "2,7 bln", gaji: "Rp6.200.000" },
+        { name: "Bayu Prakoso", bidang: "Telekomunikasi", lulus: "12 Jul 2024", diterima: "1 Des 2024", tunggu: "4,6 bln", gaji: "Rp5.000.000" },
+        { name: "Dwi Purnama", bidang: "Keuangan", lulus: "10 Jul 2025", diterima: "18 Sep 2025", tunggu: "2,3 bln", gaji: "Rp4.800.000" },
+        { name: "Nadia Safira", bidang: "Desain", lulus: "10 Jul 2025", diterima: "5 Nov 2025", tunggu: "3,9 bln", gaji: "Rp4.500.000" },
+        { name: "Rizky Hidayat", bidang: "Manufaktur", lulus: "12 Jul 2024", diterima: "20 Agu 2024", tunggu: "1,3 bln", gaji: "Rp5.600.000" }
+      ],
+      downloadReport: () => this.toast("laporan-tracer-study-2024-2026.xlsx sedang disiapkan"),
+      settings: s.settings.map(st => ({
+        name: st.name, desc: st.desc,
+        trackBg: st.on ? "#606BDF" : "#DFDBE8", justify: st.on ? "flex-end" : "flex-start",
+        toggle: () => {
+          this.setState(p => ({ settings: p.settings.map(x => x.id === st.id ? Object.assign({}, x, { on: !x.on }) : x) }));
+          this.toast(st.name + (st.on ? " dimatikan" : " diaktifkan"));
+        }
+      })),
+      staff: [
+        { initial: "HB", name: "Hendra Baskara", email: "hendra@kampus.ac.id", role: "Master Admin", bg: "#FFF1F0", fg: "#CF1322", bd: "#FFA39E" },
+        { initial: "MW", name: "Maya Wulandari", email: "maya@kampus.ac.id", role: "Staf Verifikasi", bg: "#EDEDFB", fg: "#4A54B3", bd: "#8B93E8" },
+        { initial: "TS", name: "Taufik Setiawan", email: "taufik@kampus.ac.id", role: "Staf Data", bg: "#F5F2FA", fg: "#6B6B6F", bd: "#DFDBE8" }
+      ],
+      inviteStaff: () => this.toast("Undangan staf baru dikirim via email kampus"),
+      toast: s.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>

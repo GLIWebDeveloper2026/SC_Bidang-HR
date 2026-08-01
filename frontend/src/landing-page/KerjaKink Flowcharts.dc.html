@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"><style>body{margin:0;background:#F5F2FA;font-family:Poppins,system-ui,sans-serif;color:#1B1B1F;-webkit-font-smoothing:antialiased}*{box-sizing:border-box}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}</style></helmet>
+
+<div style="max-width:1300px;margin:0 auto;padding:clamp(20px,3vw,44px) clamp(16px,3vw,32px) 60px">
+
+<div style="border-bottom:2px solid #1B1B1F;padding-bottom:20px;margin-bottom:22px">
+<div style="font-size:11.5px;font-weight:600;letter-spacing:1.4px;color:#9A9AA1;margin-bottom:10px">FLOWCHART · TIGA PERAN</div>
+<h1 style="font-size:clamp(24px,3vw,36px);font-weight:700;letter-spacing:-0.9px;margin:0 0 8px">Alur pengguna KerjaKink</h1>
+<p style="font-size:14px;color:#6B6B6F;margin:0;max-width:66ch;text-wrap:pretty">Tiga alur yang saling terhubung: pelamar mengirim lamaran, HRD menggerakkan tahapan seleksi, Admin BKK menjaga kualitas lowongan dan menarik data akreditasi.</p>
+</div>
+
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+<sc-for list="{{ roles }}" as="r" hint-placeholder-count="3">
+<button onClick="{{ r.pick }}" style="display:flex;align-items:center;gap:9px;background:{{ r.bg }};color:{{ r.fg }};border:1px solid {{ r.bd }};padding:10px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer" style-hover="border-color:#606BDF">
+<span style="width:7px;height:7px;border-radius:50%;background:{{ r.dot }}"></span>{{ r.name }}
+</button>
+</sc-for>
+</div>
+
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:18px 20px;margin-bottom:18px">
+<div style="font-size:15px;font-weight:600;margin-bottom:5px">{{ current.title }}</div>
+<div style="font-size:13px;color:#6B6B6F;line-height:1.6;max-width:80ch">{{ current.desc }}</div>
+</div>
+
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px">
+<sc-for list="{{ legend }}" as="l" hint-placeholder-count="6">
+<div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #DFDBE8;border-radius:8px;padding:8px 12px">
+<span style="width:20px;height:{{ l.h }};background:{{ l.bg }};border:{{ l.border }};border-radius:{{ l.radius }};transform:{{ l.rotate }};flex:0 0 auto"></span>
+<span style="font-size:12px;color:#6B6B6F">{{ l.name }}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:clamp(14px,2vw,26px);margin-bottom:26px;overflow-x:auto">
+<sc-if value="{{ isMhs }}" hint-placeholder-val="{{ true }}">
+<img src="assets/diagram/flow-mahasiswa-alumni.svg" alt="Flowchart alur mahasiswa dan alumni" style="display:block;width:100%;min-width:820px;height:auto"/>
+</sc-if>
+<sc-if value="{{ isHrd }}">
+<img src="assets/diagram/flow-hrd-perusahaan.svg" alt="Flowchart alur perusahaan dan HRD" style="display:block;width:100%;min-width:820px;height:auto"/>
+</sc-if>
+<sc-if value="{{ isAdm }}">
+<img src="assets/diagram/flow-admin-bkk.svg" alt="Flowchart alur Admin BKK" style="display:block;width:100%;min-width:820px;height:auto"/>
+</sc-if>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:28px">
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:20px">
+<h2 style="font-size:15px;font-weight:600;margin:0 0 14px">Titik keputusan &amp; aturan sistem</h2>
+<div style="display:flex;flex-direction:column;gap:13px">
+<sc-for list="{{ current.decisions }}" as="d" hint-placeholder-count="4">
+<div style="border-left:2px solid #FFE58F;padding-left:13px">
+<div style="font-size:13px;font-weight:600;margin-bottom:3px">{{ d.q }}</div>
+<div style="font-size:12.5px;color:#6B6B6F;line-height:1.6">{{ d.rule }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="background:#fff;border:1px solid #DFDBE8;border-radius:10px;padding:20px">
+<h2 style="font-size:15px;font-weight:600;margin:0 0 14px">Status yang muncul di alur ini</h2>
+<div style="display:flex;flex-direction:column;gap:10px">
+<sc-for list="{{ current.statuses }}" as="s" hint-placeholder-count="4">
+<div style="display:flex;gap:11px;align-items:flex-start">
+<span style="font-size:11.5px;font-weight:500;color:{{ s.fg }};background:{{ s.bg }};border:1px solid {{ s.bd }};padding:4px 10px;border-radius:5px;flex:0 0 auto;min-width:104px;text-align:center">{{ s.name }}</span>
+<span style="font-size:12.5px;color:#6B6B6F;line-height:1.55;flex:1">{{ s.desc }}</span>
+</div>
+</sc-for>
+</div>
+<div style="height:1px;background:#DFDBE8;margin:16px 0"></div>
+<p style="font-size:12px;color:#9A9AA1;margin:0;line-height:1.6">{{ current.note }}</p>
+</div>
+</div>
+
+<div style="border-top:1px solid #DFDBE8;padding-top:18px;font-size:12px;color:#9A9AA1;line-height:1.7">File diagram: <code>assets/diagram/flow-mahasiswa-alumni.svg</code>, <code>flow-hrd-perusahaan.svg</code>, <code>flow-admin-bkk.svg</code> — SVG skalabel dengan warna dari <code>tokens/colors.css</code>.</div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1300,&quot;height&quot;:1000}}">
+const S = {
+  pending: { name: "Pending", bg: "#FFFBE6", fg: "#D48806", bd: "#FFE58F" },
+  verified: { name: "Verified", bg: "#F6FFED", fg: "#237804", bd: "#B7EB8F" },
+  blacklist: { name: "Blacklist", bg: "#FFF1F0", fg: "#CF1322", bd: "#FFA39E" }
+};
+
+const ROLES = [
+  { id: "mhs", name: "Mahasiswa & Alumni", title: "Alur Mahasiswa & Alumni (Pelamar)",
+    desc: "Pencarian terbuka tanpa login; akun baru diminta tepat saat menekan Lamar. Saat lamaran terkirim, CV disalin sebagai snapshot sehingga perubahan profil setelahnya tidak mengubah berkas yang sudah diterima HRD.",
+    decisions: [
+      { q: "Tertarik melamar?", rule: "Cari, filter, dan detail lowongan bisa diakses tanpa akun — pengguna bebas keluar-masuk daftar." },
+      { q: "Sudah punya akun?", rule: "Login hanya diminta di titik Lamar, lalu pengguna dikembalikan ke lowongan yang tadi dibuka." },
+      { q: "Profil & CV lengkap?", rule: "Pengiriman ditahan sampai data diri dan satu CV utama tersedia; CV itu dipakai berulang." },
+      { q: "Hasil seleksi?", rule: "Setiap perubahan tahap memicu notifikasi. Saat Diterima, sistem menulis tanggal lulus, tanggal diterima, bidang, dan gaji awal ke riwayat lamaran." }
+    ],
+    statuses: [
+      { name: "Menunggu", desc: "Lamaran terkirim, belum dibuka HRD.", bg: "#FFFBE6", fg: "#D48806", bd: "#FFE58F" },
+      { name: "Dalam seleksi", desc: "Berjalan di salah satu tahapan; posisi tahap terlihat di riwayat.", bg: "#EDEDFB", fg: "#4A54B3", bd: "#8B93E8" },
+      { name: "Diterima", desc: "Kuota posisi terpakai; data tracer study tercatat otomatis.", bg: "#F6FFED", fg: "#237804", bd: "#B7EB8F" },
+      { name: "Ditolak", desc: "Notifikasi privat; lamaran lain milik pengguna tetap berjalan.", bg: "#FFF1F0", fg: "#CF1322", bd: "#FFA39E" }
+    ],
+    note: "Status penolakan hanya terlihat oleh pelamar terkait — tidak pernah tampil ke pelamar lain maupun publik." },
+
+  { id: "hrd", name: "Perusahaan / HRD", title: "Alur Perusahaan / HRD",
+    desc: "Perusahaan tidak bisa memasang lowongan sebelum Admin BKK menyetujui dokumennya. Satu lowongan dapat memuat beberapa posisi dengan kuota masing-masing, dan tahapan seleksi bisa disusun 2 sampai 7+ tahap.",
+    decisions: [
+      { q: "Disetujui Admin BKK?", rule: "Selama status Pending, menu buat lowongan terkunci. Penolakan atau blacklist menutup akses posting sepenuhnya." },
+      { q: "Kandidat lolos tahap ini?", rule: "Menolak kandidat mengirim notifikasi privat hanya ke pelamar tersebut, lalu HRD kembali ke daftar kandidat." },
+      { q: "Sudah tahap terakhir?", rule: "Kandidat dipindahkan satu tahap per aksi; jumlah tahap mengikuti konfigurasi lowongan." },
+      { q: "Kuota lowongan penuh?", rule: "Kuota terisi otomatis setiap kali kandidat diterima. Begitu penuh, lowongan ditutup dan hilang dari daftar publik." }
+    ],
+    statuses: [
+      S.pending, S.verified, S.blacklist,
+      { name: "Kuota penuh", desc: "Lowongan ditutup otomatis, lamaran tersisa masuk talent pool.", bg: "#EDEDFB", fg: "#4A54B3", bd: "#8B93E8" }
+    ],
+    note: "Status Pending dan Blacklist ditentukan Admin BKK, bukan oleh perusahaan sendiri." },
+
+  { id: "adm", name: "Admin BKK", title: "Alur Admin BKK (Master Admin)",
+    desc: "Admin memegang dua kendali: gerbang verifikasi perusahaan di depan, dan pelaporan tracer study di belakang. Data akreditasi tidak diisi manual — terkumpul dari setiap lamaran yang berstatus Diterima.",
+    decisions: [
+      { q: "Dokumen sah & lengkap?", rule: "Dokumen kurang atau tidak sah dikembalikan; perusahaan tetap Pending sampai unggah ulang." },
+      { q: "Ada laporan pelanggaran?", rule: "Perusahaan bermasalah di-blacklist dan seluruh lowongannya langsung disembunyikan dari publik." },
+      { q: "Periode akreditasi?", rule: "Di luar periode, admin fokus mengelola akun staf BKK dan kebijakan portal (wajib verifikasi, privasi identitas pelamar, sinkron SIAKAD)." }
+    ],
+    statuses: [
+      S.pending, S.verified, S.blacklist,
+      { name: "Ditolak", desc: "Dokumen dikembalikan; perusahaan bisa mengajukan ulang.", bg: "#F5F2FA", fg: "#6B6B6F", bd: "#DFDBE8" }
+    ],
+    note: "Setiap keputusan verifikasi tercatat di log aktivitas beserta nama admin yang memprosesnya." }
+];
+
+const LEGEND = [
+  { name: "Proses / langkah", bg: "#FFFFFF", border: "2px solid #DFDBE8", radius: "3px", h: "13px", rotate: "none" },
+  { name: "Keputusan", bg: "#FFFBE6", border: "2px solid #FFE58F", radius: "2px", h: "16px", rotate: "rotate(45deg)" },
+  { name: "Aksi utama", bg: "#606BDF", border: "none", radius: "3px", h: "13px", rotate: "none" },
+  { name: "Hasil positif", bg: "#F6FFED", border: "2px solid #B7EB8F", radius: "3px", h: "13px", rotate: "none" },
+  { name: "Hasil negatif", bg: "#FFF1F0", border: "2px solid #FFA39E", radius: "3px", h: "13px", rotate: "none" },
+  { name: "Kembali ke langkah sebelumnya", bg: "#9A9AA1", border: "none", radius: "0", h: "2px", rotate: "none" }
+];
+
+class Component extends DCLogic {
+  state = { role: "mhs" };
+
+  renderVals() {
+    const r = this.state.role;
+    return {
+      roles: ROLES.map(x => ({
+        name: x.name, pick: () => this.setState({ role: x.id }),
+        bg: r === x.id ? "#EDEDFB" : "#FFFFFF",
+        fg: r === x.id ? "#4A54B3" : "#6B6B6F",
+        bd: r === x.id ? "#606BDF" : "#DFDBE8",
+        dot: r === x.id ? "#606BDF" : "#DFDBE8"
+      })),
+      current: ROLES.find(x => x.id === r),
+      isMhs: r === "mhs", isHrd: r === "hrd", isAdm: r === "adm",
+      legend: LEGEND
+    };
+  }
+}
+
+</script>
+</body>
+</html>
