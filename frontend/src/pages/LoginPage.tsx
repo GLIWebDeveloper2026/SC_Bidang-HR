@@ -70,10 +70,10 @@ export function LoginPage() {
     setIsSigningIn(true);
 
     try {
-      const redirectTo = new URL(from, AUTH_REDIRECT_ORIGIN).toString();
-      window.location.href = buildSupabaseOAuthUrl('google', redirectTo);
+      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      window.location.href = `${backendUrl}/v1/auth/google`;
     } catch {
-      setError('Gagal membuka login Google. Cek konfigurasi Supabase dan Google provider.');
+      setError('Gagal membuka login Google.');
       setIsSigningIn(false);
     }
   };

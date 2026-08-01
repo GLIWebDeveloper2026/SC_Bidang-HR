@@ -171,6 +171,7 @@ export interface RegisterUserResult {
 
 export const API_ENDPOINTS = {
   authRegister: '/v1/auth/register',
+  authLogin: '/v1/auth/login',
   companies: '/v1/companies',
   companyRegister: '/v1/companies/register',
   companyJobs: '/v1/companies/jobs',
@@ -184,6 +185,14 @@ export const API_ENDPOINTS = {
 export async function registerUser(payload: RegisterUserPayload) {
   const { data } = await apiClient.post<ApiResponse<RegisterUserResult>>(
     API_ENDPOINTS.authRegister,
+    payload
+  );
+  return data;
+}
+
+export async function loginUser(payload: Pick<RegisterUserPayload, 'email' | 'password'>) {
+  const { data } = await apiClient.post<ApiResponse<{ token: string; user: RegisteredProfile }>>(
+    API_ENDPOINTS.authLogin,
     payload
   );
   return data;
@@ -205,7 +214,7 @@ export async function getCompanies() {
 }
 
 export async function createCompany(payload: CreateCompanyPayload) {
-  if (!localStorage.getItem('auth_token')) {
+  if (!document.cookie.includes('auth_token=')) {
     throw new Error('Belum login atau session telah berakhir');
   }
 
@@ -232,7 +241,7 @@ export async function getApplications() {
 }
 
 export async function createCompanyJob(payload: CreateCompanyJobPayload) {
-  if (!localStorage.getItem('auth_token')) {
+  if (!document.cookie.includes('auth_token=')) {
     throw new Error('Belum login atau session telah berakhir');
   }
 

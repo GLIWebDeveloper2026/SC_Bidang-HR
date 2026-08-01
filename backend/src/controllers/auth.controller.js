@@ -31,18 +31,18 @@ class AuthController {
           // Tentukan URL Frontend Anda (bisa Anda simpan di file .env, misal: FRONTEND_URL=http://localhost:3000)
           const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-          // Redirect ke halaman frontend sambil membawa token (dan data tambahan jika perlu)
-          // Frontend nantinya dapat membaca token ini dari URL: http://localhost:3000/auth-success?token=eyJhb...
-          return res.redirect(`${frontendUrl}/auth-success?token=${result.token}`);
+      // Redirect ke halaman dashboard sambil membawa token
+      return res.redirect(`${frontendUrl}/dashboard?token=${result.token}`);
 
-        } catch (error) {
-          console.error('Google Callback Error:', error);
-
-          const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-          // Jika terjadi error, redirect ke halaman login dengan pesan error
-          return res.redirect(`${frontendUrl}/login?error=Otentikasi Gagal`);
-        }
-      }// Endpoint untuk register manual
+    } catch (error) {
+      console.error('Google Callback Error:', error);
+      
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      // Jika terjadi error, redirect ke halaman login dengan pesan error
+      return res.redirect(`${frontendUrl}/login?error=Otentikasi Gagal`);
+    }
+  }
+      // Endpoint untuk register manual
   async register(req, res) {
     try {
       const { nama, email, password, level_uid } = req.body;

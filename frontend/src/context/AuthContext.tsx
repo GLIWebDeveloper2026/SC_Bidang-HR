@@ -45,9 +45,16 @@ function normalizeUser(user: User): User {
 }
 
 function clearStoredAuth() {
-  localStorage.removeItem(AUTH_TOKEN_KEY);
+  document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
   localStorage.removeItem(AUTH_REFRESH_TOKEN_KEY);
   localStorage.removeItem(AUTH_USER_KEY);
+}
+
+function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
 }
 
 function readUrlAuthParams() {
@@ -55,7 +62,7 @@ function readUrlAuthParams() {
   const queryParams = new URLSearchParams(window.location.search);
 
   return {
-    accessToken: hashParams.get('access_token'),
+    accessToken: hashParams.get('access_token') || queryParams.get('token'),
     refreshToken: hashParams.get('refresh_token'),
     error:
       hashParams.get('error_description') ||
@@ -80,15 +87,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null);
   }, []);
 
-  const saveSession = useCallback(async (session: SupabaseSession) => {
+  const saveSession = useCallback(async (session: { access_token: string; refresh_token?: string }) => {
     if (!session.access_token) {
-      throw new Error('Supabase tidak mengirim access token.');
+      throw new Error('Token tidak ditemukan.');
     }
 
-    const supabaseUser = session.user || (await getSupabaseUser(session.access_token));
-    const authenticatedUser = normalizeUser(mapSupabaseUser(supabaseUser));
+    // Set token ke cookie terlebih dahulu agar apiClient bisa menggunakannya
+    document.cookie = `${AUTH_TOKEN_KEY}=${session.access_token}; path=/; max-age=86400`;
+    
+    // Ambil data profil dari backend kita
+    const { getMyProfile } = await import('@/api/api');
+    const backendUser = await getMyProfile();
+    const authenticatedUser = normalizeUser(backendUser as any);
 
-    localStorage.setItem(AUTH_TOKEN_KEY, session.access_token);
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(authenticatedUser));
 
     if (session.refresh_token) {
@@ -127,7 +138,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return;
       }
 
-      const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
+      const storedToken = getCookie(AUTH_TOKEN_KEY);
       const storedRefreshToken = localStorage.getItem(AUTH_REFRESH_TOKEN_KEY);
       const storedUser = localStorage.getItem(AUTH_USER_KEY);
 
@@ -138,22 +149,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       try {
-        await getSupabaseUser(storedToken);
+        // Karena kita menggunakan backend kustom (bukan Supabase),
+        // kita percaya token yang ada di cookie selama masih ada.
+        // Jika token invalid/expired, interceptor apiClient akan otomatis
+        // menangkap 401 Unauthorized dan me-logout user.
         setToken(storedToken);
         setUser(normalizeUser(JSON.parse(storedUser) as User));
       } catch {
-        if (!storedRefreshToken) {
-          clearAuthState();
-          setIsLoading(false);
-          return;
-        }
-
-        try {
-          const refreshedSession = await refreshSupabaseSession(storedRefreshToken);
-          await saveSession(refreshedSession);
-        } catch {
-          clearAuthState();
-        }
+        clearAuthState();
       } finally {
         setIsLoading(false);
       }
@@ -167,8 +170,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(true);
 
       try {
-        const session = await signInWithPassword(email, password);
-        await saveSession(session);
+        const { loginUser } = await import('@/api/api');
+        const response = await loginUser({ email, password });
+        
+        if (!response.success || !response.data) {
+          throw new Error(response.message || 'Login gagal.');
+        }
+
+        const authenticatedUser = normalizeUser(response.data.user as any);
+
+        document.cookie = `${AUTH_TOKEN_KEY}=${response.data.token}; path=/; max-age=86400`;
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(authenticatedUser));
+
+        setToken(response.data.token);
+        setUser(authenticatedUser);
       } catch (error) {
         clearAuthState();
         throw error;
@@ -176,7 +191,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsLoading(false);
       }
     },
-    [clearAuthState, saveSession]
+    [clearAuthState]
   );
 
   const loginWithAccessToken = useCallback(
