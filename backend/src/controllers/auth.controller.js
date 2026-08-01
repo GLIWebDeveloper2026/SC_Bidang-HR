@@ -15,29 +15,34 @@ class AuthController {
   }
 
   // Endpoint untuk menerima callback dari Google
-  async googleCallback(req, res) {
-    try {
-      const { code } = req.query;
-      
-      if (!code) {
-        return res.status(400).json({ success: false, message: 'Authorization code tidak ditemukan' });
-      }
+      // Endpoint untuk menerima callback dari Google
+      async googleCallback(req, res) {
+        try {
+          const { code } = req.query;
 
-      const result = await authService.handleGoogleCallback(code);
+          if (!code) {
+            return res.status(400).json({ success: false, message: 'Authorization code tidak ditemukan' });
+          }
 
-      // Berhasil Login / Register, kembalikan token dan data user
-      return res.status(200).json({
-        success: true,
-        message: 'Google Login berhasil',
-        data: result
-      });
-    } catch (error) {
-      console.error('Google Callback Error:', error);
-      return res.status(500).json({ success: false, message: error.message || 'Gagal memproses Google Callback' });
-    }
-  }
+          // authService.handleGoogleCallback() memproses code lalu menghasilkan token dan data user
+          const result = await authService.handleGoogleCallback(code);
 
-  // Endpoint untuk register manual
+          // --- PERUBAHAN UNTUK REDIRECT KE FRONTEND ---
+          // Tentukan URL Frontend Anda (bisa Anda simpan di file .env, misal: FRONTEND_URL=http://localhost:3000)
+          const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+          // Redirect ke halaman frontend sambil membawa token (dan data tambahan jika perlu)
+          // Frontend nantinya dapat membaca token ini dari URL: http://localhost:3000/auth-success?token=eyJhb...
+          return res.redirect(`${frontendUrl}/auth-success?token=${result.token}`);
+
+        } catch (error) {
+          console.error('Google Callback Error:', error);
+
+          const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+          // Jika terjadi error, redirect ke halaman login dengan pesan error
+          return res.redirect(`${frontendUrl}/login?error=Otentikasi Gagal`);
+        }
+      }// Endpoint untuk register manual
   async register(req, res) {
     try {
       const { nama, email, password, level_uid } = req.body;
