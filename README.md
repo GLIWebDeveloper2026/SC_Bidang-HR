@@ -1,4 +1,4 @@
-# Competition Project
+# KerjaKink Apps
 
 This repository contains the source code for the Competition Project, featuring a full-stack application with a Node.js backend and a React frontend.
 
