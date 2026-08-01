@@ -314,7 +314,7 @@ export function LowonganPage() {
 
     try {
       const tanggalTutup = data.tanggal || undefined;
-      const createdJob = await createCompanyJob({
+      await createCompanyJob({
         judul_pengumuman: data.posisi,
         deskripsi: data.deskripsi || undefined,
         lokasi_kerja: data.lokasi_kerja,
@@ -333,19 +333,10 @@ export function LowonganPage() {
         ],
       });
 
-      const newLowongan: Lowongan = {
-        id: createdJob.uid,
-        posisi: data.posisi,
-        kategori_bidang: data.kategori_bidang,
-        kuota_posisi: data.kuota_posisi,
-        perusahaan: data.perusahaan,
-        lokasi_kerja: createdJob.lokasi_kerja || data.lokasi_kerja,
-        status: getLowonganStatus(undefined, createdJob.tanggal_tutup || tanggalTutup),
-        deskripsi: createdJob.deskripsi || data.deskripsi,
-        tanggal: createdJob.tanggal_tutup || tanggalTutup,
-      };
-
-      setLowongan((prev) => [newLowongan, ...prev]);
+      // Re-fetch data dari backend agar relasi perusahaan, posisi, dsb sesuai dengan API
+      const recruitments = await getRecruitments();
+      setLowongan(recruitments.map(mapRecruitmentToLowongan));
+      
       setPage(1);
       setAddDialogOpen(false);
       methods.reset();

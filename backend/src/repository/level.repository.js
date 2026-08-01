@@ -5,7 +5,6 @@ class LevelRepository {
     const { data, error } = await supabase
       .from('level')
       .select('*')
-      .order('level', { ascending: true }) // Atau urutkan berdasarkan created_at
       .order('created_at', { ascending: true });
     
     if (error) throw error;
