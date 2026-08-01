@@ -341,7 +341,7 @@ export function LowonganPage() {
 
     try {
       const tanggalTutup = data.tanggal || undefined;
-      const createdJob = await createCompanyJob({
+      await createCompanyJob({
         judul_pengumuman: data.posisi,
         deskripsi: data.deskripsi || undefined,
         lokasi_kerja: data.lokasi_kerja,

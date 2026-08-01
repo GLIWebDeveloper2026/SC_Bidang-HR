@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Breadcrumbs,
@@ -19,28 +20,50 @@ import {
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 
-type Akreditasi = 'Unggul' | 'A' | 'B';
-
 interface Kampus {
-  id: string;
-  namaKampus: string;
-  akreditasi: Akreditasi;
+  uid: string;
+  nama_campus: string;
+  akreditasi: string;
 }
 
-const kampusData: Kampus[] = [
-  { id: '1', namaKampus: 'Universitas Indonesia', akreditasi: 'Unggul' },
-  { id: '2', namaKampus: 'Institut Teknologi Bandung', akreditasi: 'Unggul' },
-  { id: '3', namaKampus: 'Universitas Gadjah Mada', akreditasi: 'A' },
-  { id: '4', namaKampus: 'Universitas Airlangga', akreditasi: 'A' },
-];
-
-const accreditationColor: Record<Akreditasi, 'success' | 'primary' | 'default'> = {
-  Unggul: 'success',
-  A: 'primary',
-  B: 'default',
+const getAccreditationColor = (akreditasi: string) => {
+  switch (akreditasi?.toUpperCase()) {
+    case 'UNGGUL':
+      return 'success';
+    case 'A':
+      return 'primary';
+    case 'B':
+    default:
+      return 'default';
+  }
 };
 
 export function KampusPage() {
+  const [kampusData, setKampusData] = useState<Kampus[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchKampus = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/v1/campus');
+        const json = await response.json();
+        
+        if (json.success) {
+          setKampusData(json.data);
+        } else {
+          setError(json.message || 'Gagal memuat data');
+        }
+      } catch (err: any) {
+        setError(err.message || 'Terjadi kesalahan jaringan');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchKampus();
+  }, []);
+
   return (
     <Box>
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }} separator=">">
@@ -63,6 +86,12 @@ export function KampusPage() {
         </Typography>
       </Box>
 
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+
       <TableContainer
         component={Paper}
         sx={{
@@ -81,27 +110,37 @@ export function KampusPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {kampusData.map((kampus) => (
-              <TableRow key={kampus.id} hover>
-                <TableCell>{kampus.namaKampus}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={kampus.akreditasi}
-                    color={accreditationColor[kampus.akreditasi]}
-                    size="small"
-                    variant="outlined"
-                  />
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton size="small" aria-label="edit kampus">
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" aria-label="aksi kampus">
-                    <MoreVertIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={3} align="center">Memuat data...</TableCell>
               </TableRow>
-            ))}
+            ) : kampusData.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} align="center">Tidak ada data kampus</TableCell>
+              </TableRow>
+            ) : (
+              kampusData.map((kampus) => (
+                <TableRow key={kampus.uid} hover>
+                  <TableCell>{kampus.nama_campus}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={kampus.akreditasi || '-'}
+                      color={getAccreditationColor(kampus.akreditasi)}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton size="small" aria-label="edit kampus">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small" aria-label="aksi kampus">
+                      <MoreVertIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

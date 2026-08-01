@@ -2,25 +2,31 @@ const supabase = require('../config/supabase');
 const authRepository = require('../repository/auth.repository');
 
 class AuthService {
-  async register(data) {
+ async register(data) {
     const { email, password, nama, level_id } = data;
 
-    // 1. Register di Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
+      email: email,
+      password: password,
+      options: {
+        data: {
+          nama: nama,
+          level_id: level_id
+        }
+      }
     });
 
     if (authError) {
-      throw new Error(authError.message);
+      console.error("Supabase Auth Error Detail:", JSON.stringify(authError, null, 2));
+      throw authError;
     }
 
     const userId = authData.user?.id;
     if (!userId) {
-      throw new Error("Gagal mendapatkan UID dari Supabase Auth");
+      throw new Error("Gagal mendapatkan UID dari Supabase Auth. Kemungkinan email ini sudah terdaftar atau perlu verifikasi.");
     }
 
-    // 2. Insert ke tabel profile (atau profiles)
+    // Insert ke tabel profiles secara manual karena trigger handle_new_user tidak ada
     const payloadProfile = {
       uid: userId,
       nama: nama,
@@ -30,15 +36,14 @@ class AuthService {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
-
+    
     const profile = await authRepository.createProfile(payloadProfile);
 
     return {
       user: authData.user,
-      profile
+      session: authData.session
     };
   }
-
   async login(data) {
     const { email, password } = data;
 

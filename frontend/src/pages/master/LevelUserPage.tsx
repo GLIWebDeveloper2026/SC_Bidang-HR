@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Breadcrumbs,
@@ -19,20 +20,37 @@ import {
 } from '@mui/icons-material';
 
 interface LevelUser {
-  id: string;
-  level: string;
+  uid: string;
+  level: number;
   role: string;
 }
 
-const levelUserData: LevelUser[] = [
-  { id: '1', level: 'Level 1', role: 'Super Admin' },
-  { id: '2', level: 'Level 2', role: 'Admin HR' },
-  { id: '3', level: 'Level 3', role: 'Perusahaan' },
-  { id: '4', level: 'Level 4', role: 'Kampus' },
-  { id: '5', level: 'Level 5', role: 'Applicant' },
-];
-
 export function LevelUserPage() {
+  const [levelUserData, setLevelUserData] = useState<LevelUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchLevelUser = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/v1/levels');
+        const json = await response.json();
+        
+        if (json.success) {
+          setLevelUserData(json.data);
+        } else {
+          setError(json.message || 'Gagal memuat data');
+        }
+      } catch (err: any) {
+        setError(err.message || 'Terjadi kesalahan jaringan');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLevelUser();
+  }, []);
+
   return (
     <Box>
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }} separator=">">
@@ -55,6 +73,12 @@ export function LevelUserPage() {
         </Typography>
       </Box>
 
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
+
       <TableContainer
         component={Paper}
         sx={{
@@ -73,20 +97,30 @@ export function LevelUserPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {levelUserData.map((item) => (
-              <TableRow key={item.id} hover>
-                <TableCell>{item.level}</TableCell>
-                <TableCell>{item.role}</TableCell>
-                <TableCell align="right">
-                  <IconButton size="small" aria-label="edit level user">
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" aria-label="aksi level user">
-                    <MoreVertIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={3} align="center">Memuat data...</TableCell>
               </TableRow>
-            ))}
+            ) : levelUserData.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} align="center">Tidak ada data level</TableCell>
+              </TableRow>
+            ) : (
+              levelUserData.map((item) => (
+                <TableRow key={item.uid} hover>
+                  <TableCell>{item.level}</TableCell>
+                  <TableCell>{item.role}</TableCell>
+                  <TableCell align="right">
+                    <IconButton size="small" aria-label="edit level user">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small" aria-label="aksi level user">
+                      <MoreVertIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
