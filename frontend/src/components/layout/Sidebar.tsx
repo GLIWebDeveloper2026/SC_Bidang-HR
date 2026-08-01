@@ -10,14 +10,12 @@ import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
   Group as GroupIcon,
-  Settings as SettingsIcon,
   Folder as FolderIcon,
-  Description as DescriptionIcon,
   MoreHoriz as MoreHorizIcon,
-  KeyboardArrowRight as ArrowRightIcon,
 } from '@mui/icons-material';
 import { NavItem } from './NavItem';
 import { useAuth } from '@/hooks';
+import logoLockupLight from '@/assets/logo-lockup.svg';
 
 export const DRAWER_WIDTH = 254;
 
@@ -62,29 +60,17 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
     //   path: '/blog',
     //   icon: <ArticleIcon fontSize="small" />,
     // },
-    {
-      label: 'Setting',
-      path: '/settings',
-      icon: <SettingsIcon fontSize="small" />,
-    },
+    // {
+    //   label: 'Setting',
+    //   path: '/settings',
+    //   icon: <SettingsIcon fontSize="small" />,
+    // },
   ];
 
   const masterChildren = [
     { label: 'Perusahaan', path: '/master/perusahaan' },
     { label: 'Kampus', path: '/master/kampus' },
     { label: 'Level User', path: '/master/level-user' },
-  ];
-
-  const pageChildren = [
-    { label: 'Authentication', path: '/pages/auth' },
-    { label: 'Onboarding', path: '/pages/onboarding' },
-    { label: 'Sample Page', path: '/pages/sample' },
-  ];
-
-  const otherChildren = [
-    { label: 'Changelog', path: '/changelog' },
-    { label: 'Documentation', path: '/documentation' },
-    { label: 'Support', path: '/support' },
   ];
 
   const drawerContent = (
@@ -101,43 +87,24 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          px: 2.5,
+          justifyContent: 'flex-end',
+          px: 2,
           py: 2,
           minHeight: 76,
         }}
       >
         <Box
+          component="img"
+          src={logoLockupLight}
+          alt="KerjaKink"
           sx={{
-            width: 32,
-            height: 32,
-            borderRadius: 1,
-            bgcolor: 'primary.main',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mr: 1.5,
+            display: 'block',
+            width: 210,
+            maxWidth: '100%',
+            height: 'auto',
+            flexShrink: 0,
           }}
-        >
-          <Typography
-            sx={{
-              color: 'white',
-              fontWeight: 700,
-              fontSize: '1.25rem',
-            }}
-          >
-            S
-          </Typography>
-        </Box>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            color: 'text.primary',
-            letterSpacing: '-0.5px',
-          }}
-        >
-          KerjaKink
-        </Typography>
+        />
       </Box>
 
       {/* User Profile Card */}
@@ -170,6 +137,7 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
           <Box sx={{ ml: 1.5, flex: 1, minWidth: 0 }}>
             <Typography
               variant="subtitle2"
+              noWrap
               sx={{
                 fontWeight: 600,
                 color: 'text.primary',
@@ -180,6 +148,7 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
             </Typography>
             <Typography
               variant="caption"
+              noWrap
               sx={{
                 color: 'text.secondary',
                 display: 'block',
@@ -231,7 +200,7 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
           />
         </List>
 
-        <List component="nav" disablePadding sx={{ mt: 1 }}>
+        {/* <List component="nav" disablePadding sx={{ mt: 1 }}>
           <NavItem
             label="Page"
             icon={<DescriptionIcon fontSize="small" />}
@@ -242,9 +211,9 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
             icon={<MoreHorizIcon fontSize="small" />}
             children={otherChildren}
           />
-        </List>
+        </List> */}
 
-        <List component="nav" disablePadding sx={{ mt: 1 }}>
+        {/* <List component="nav" disablePadding sx={{ mt: 1 }}>
           <NavItem
             label="Menu Levels"
             icon={<ArrowRightIcon fontSize="small" />}
@@ -253,7 +222,7 @@ export function Sidebar({ open, onClose, variant }: SidebarProps) {
               { label: 'Level 2', path: '/menu/level2' },
             ]}
           />
-        </List>
+        </List> */}
       </Box>
 
       {/* Version Badge */}

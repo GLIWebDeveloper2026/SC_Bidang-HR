@@ -24,8 +24,9 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { getCompanies, updateCompany, type Company } from '@/api/api';
+import { createCompany, getCompanies, updateCompany, type Company } from '@/api/api';
 import { ButtonCreatePerusahaan } from '@/components/button/button-perusahaan/ButtonCreatePerusahaan';
+import { DialogCreatePerusahaan } from '@/components/dialog/dialog-perusahaan/DialogCreatePerusahaan';
 import { DialogEditPerusahaan } from '@/components/dialog/dialog-perusahaan/DialogEditPerusahaan';
 
 type VerificationStatus = 'Terverifikasi' | 'Menunggu' | 'Ditolak';
@@ -55,6 +56,18 @@ const perusahaanSchema = z.object({
 });
 
 export type PerusahaanFormData = z.infer<typeof perusahaanSchema>;
+
+const createPerusahaanSchema = z.object({
+  namaPerusahaan: z.string().min(1, 'Nama perusahaan wajib diisi'),
+  alamat: z.string().min(1, 'Alamat wajib diisi'),
+  email: z.string().email('Format email tidak valid'),
+  telepon: z.string().min(1, 'Telepon wajib diisi'),
+  nibNpwp: z.string().min(1, 'NIB/NPWP wajib diisi'),
+  legalDocUrl: z.string().url('URL dokumen legal tidak valid'),
+  jabatan: z.string().optional(),
+});
+
+export type CreatePerusahaanFormData = z.infer<typeof createPerusahaanSchema>;
 
 const statusColor: Record<VerificationStatus, 'success' | 'warning' | 'error'> = {
   Terverifikasi: 'success',
@@ -100,10 +113,25 @@ const formatDate = (date: string) =>
 export function PerusahaanPage() {
   const [perusahaanData, setPerusahaanData] = useState<Perusahaan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmittingCreate, setIsSubmittingCreate] = useState(false);
   const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedPerusahaan, setSelectedPerusahaan] = useState<Perusahaan | null>(null);
+
+  const createMethods = useForm<CreatePerusahaanFormData>({
+    resolver: zodResolver(createPerusahaanSchema),
+    defaultValues: {
+      namaPerusahaan: '',
+      alamat: '',
+      email: '',
+      telepon: '',
+      nibNpwp: '',
+      legalDocUrl: '',
+      jabatan: '',
+    },
+  });
 
   const editMethods = useForm<PerusahaanFormData>({
     resolver: zodResolver(perusahaanSchema),
@@ -117,7 +145,44 @@ export function PerusahaanPage() {
   });
 
   const handleCreatePerusahaan = () => {
-    // TODO: Sambungkan ke dialog create perusahaan saat formnya tersedia.
+    setErrorMessage('');
+    createMethods.reset();
+    setCreateDialogOpen(true);
+  };
+
+  const handleCloseCreateDialog = () => {
+    if (isSubmittingCreate) {
+      return;
+    }
+
+    setCreateDialogOpen(false);
+    createMethods.reset();
+  };
+
+  const handleSubmitCreatePerusahaan = async (data: CreatePerusahaanFormData) => {
+    setIsSubmittingCreate(true);
+    setErrorMessage('');
+
+    try {
+      const createdCompany = await createCompany({
+        nama_perusahaan: data.namaPerusahaan,
+        alamat: data.alamat,
+        email: data.email,
+        telepon: data.telepon,
+        nib_npwp: data.nibNpwp,
+        legal_doc_url: data.legalDocUrl,
+        jabatan: data.jabatan || undefined,
+      });
+      const createdPerusahaan = mapCompanyToPerusahaan(createdCompany);
+
+      setPerusahaanData((currentData) => [createdPerusahaan, ...currentData]);
+      setCreateDialogOpen(false);
+      createMethods.reset();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Gagal menambahkan perusahaan');
+    } finally {
+      setIsSubmittingCreate(false);
+    }
   };
 
   const handleOpenEditDialog = (perusahaan: Perusahaan) => {
@@ -308,6 +373,13 @@ export function PerusahaanPage() {
         statusOptions={statusOptions}
         onClose={handleCloseEditDialog}
         onSubmit={handleSubmitEditPerusahaan}
+      />
+      <DialogCreatePerusahaan
+        open={createDialogOpen}
+        isSubmitting={isSubmittingCreate}
+        methods={createMethods}
+        onClose={handleCloseCreateDialog}
+        onSubmit={handleSubmitCreatePerusahaan}
       />
     </Box>
   );

@@ -8,7 +8,19 @@ export interface Company {
   email: string | null;
   telepon: string | null;
   status_verifikasi: string;
+  legal_doc_url?: string | null;
+  nib_npwp?: string | null;
   created_at: string;
+}
+
+export interface CreateCompanyPayload {
+  nama_perusahaan: string;
+  alamat: string;
+  email: string;
+  telepon: string;
+  nib_npwp: string;
+  legal_doc_url: string;
+  jabatan?: string;
 }
 
 export interface UpdateCompanyPayload {
@@ -121,6 +133,7 @@ export interface UpdateProfilePayload {
 
 export const API_ENDPOINTS = {
   companies: '/v1/companies',
+  companyRegister: '/v1/companies/register',
   companyJobs: '/v1/companies/jobs',
   profileMe: '/v1/profiles/me',
   profileUpdate: '/v1/profiles/update',
@@ -130,6 +143,15 @@ export const API_ENDPOINTS = {
 
 export async function getCompanies() {
   const { data } = await apiClient.get<ApiResponse<Company[]>>(API_ENDPOINTS.companies);
+  return data.data;
+}
+
+export async function createCompany(payload: CreateCompanyPayload) {
+  if (!localStorage.getItem('auth_token')) {
+    throw new Error('Belum login atau session telah berakhir');
+  }
+
+  const { data } = await apiClient.post<ApiResponse<Company>>(API_ENDPOINTS.companyRegister, payload);
   return data.data;
 }
 
